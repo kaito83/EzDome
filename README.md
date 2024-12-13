@@ -13,11 +13,12 @@ The shutter acts as the "client" and connects to the rotator, which serves as th
 I won't and don't intend to help with hardware installation or where to connect what. Google and ChatGPT are your friends—look it up!!!
 
 Features:
-	EzDome(rotator)
+	EzDome(rotator):
 	- Resolution DD:MM (360*60=21600)
 	- Home find, shortest route on GOTO
-	- Etc
-	EzShutter(Shutter, rolo, window etc)
+	- Etc, what a Dome needs to know
+	EzShutter(Shutter, rolo, window etc):
 	- Opening / closing with endstops
 	- Movement check with error report 
 
+Flashing with Arduino IDE, choose ESP32 Dev module, 240Mhz Wifi/BT, flash mode DIO
