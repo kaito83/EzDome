@@ -25,7 +25,7 @@ EzDome(rotator):
 EzShutter(Shutter, rolo, window etc):
   -   Opening / closing with endstops
   -   Movement check with error report
-  -   EzShutter can work as stand alone if just want rollof observatory
+  -   EzShutter can work as standalone if just want roll-off observatory
 
 
 Set your pinouts in EzDome.h, EzShutter.h and other settings (only end of Config end), leave the BLE settings as default unless you know what you're doing.
