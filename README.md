@@ -30,3 +30,5 @@ EzShutter(Shutter, rolo, window etc):
 Set your pinouts in EzDome.h, EzShutter.h and other settings (only end of Config end), leave the BLE settings as default unless you know what you're doing.
 Flashing with Arduino IDE, choose ESP32 Dev module, 240Mhz Wifi/BT, flash mode DIO.
 Serial communication bitrate: 9600
+
+![image](https://github.com/user-attachments/assets/0c31f90e-cfdd-480d-a439-4fe2661a7a81)
