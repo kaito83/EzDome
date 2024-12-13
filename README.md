@@ -31,4 +31,8 @@ Set your pinouts in EzDome.h, EzShutter.h and other settings (only end of Config
 Flashing with Arduino IDE, choose ESP32 Dev module, 240Mhz Wifi/BT, flash mode DIO.
 Serial communication bitrate: 9600
 
+------------
+EzDome.exe - Native UI also can connect to mount
+ASCOM.EzDome.exe - ASCOM driver need to figure out how to register :)
+
 ![image](https://github.com/user-attachments/assets/0c31f90e-cfdd-480d-a439-4fe2661a7a81)
