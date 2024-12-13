@@ -19,6 +19,7 @@ Features:
 EzDome(rotator): 
   -   Resolution DD:MM (360*60=21600)
   -   Home find, shortest route on GOTO
+  -   PWM controll for fan or etc.
   -   Etc, what a simple Dome needs to know
     
 EzShutter(Shutter, rolo, window etc):
