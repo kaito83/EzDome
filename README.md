@@ -28,8 +28,10 @@ EzShutter(Shutter, rolo, window etc):
   -   EzShutter can work as standalone if just want roll-off observatory
 
 
+In Arduino IDE download the necessary libraries.
 Set your pinouts in EzDome.h, EzShutter.h and other settings (only end of Config end), leave the BLE settings as default unless you know what you're doing.
 Flashing with Arduino IDE, choose ESP32 Dev module, 240Mhz Wifi/BT, flash mode DIO.
+
 Serial communication bitrate: 9600
 
 ------------
