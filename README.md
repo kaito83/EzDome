@@ -12,17 +12,21 @@ The shutter acts as the "client" and connects to the rotator, which serves as th
 
 EzShutter can work as stand alone if just want rollof observatory.
 
-I won't and don't intend to help with hardware installation or where to connect what. Google and ChatGPT are your friends—look it up!!!
+Sorry but I won't and don't intend to help with hardware installation or where to connect what and etc. Google and ChatGPT are your friends—look it up!!!
 ------------
 Features:
-	EzDome(rotator): 
+
+EzDome(rotator): 
   -   Resolution DD:MM (360*60=21600)
   -   Home find, shortest route on GOTO
   -   Etc, what a simple Dome needs to know
-	EzShutter(Shutter, rolo, window etc):
+    
+EzShutter(Shutter, rolo, window etc):
   -   Opening / closing with endstops
   -   Movement check with error report
-  -   EzShutter can work as stand alone if just want rollof observatory.
+  -   EzShutter can work as stand alone if just want rollof observatory
 
+
+Set your pinouts in EzDome.h, EzShutter.h and other settings (only end of Config end), leave the BLE settings as default unless you know what you're doing.
 Flashing with Arduino IDE, choose ESP32 Dev module, 240Mhz Wifi/BT, flash mode DIO.
 Serial communication bitrate: 9600
