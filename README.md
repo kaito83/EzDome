@@ -1,6 +1,9 @@
 # EzDome
 Free open source observatory Dome firmware with ASCOM support and Native UI.
 
+UPDATE, please use V2, and read changes!
+https://github.com/kaito83/EzDome/releases/tag/EzDome_V2
+
 This project was created because I couldn't find any reasonable free firmware for observatory control.
 It doesn't include any fancy features, like Ethernet connection and an off-grid system for power outages.
 It only knows what I needed.
