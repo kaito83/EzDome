@@ -1,10 +1,11 @@
+#include "steppers.h";
+#include "EzShutter.h";
 #include <AccelStepper.h>;
 #include <Wire.h>;
-#include "EzShutter.h";
 
 AccelStepper shutter(AccelStepper::DRIVER, shutter_stp, shutter_dir);
 
-void shut_init(float speed, float accel) {
+void stepper::init(float speed, float accel) {
   shutter.setEnablePin(shutter_en);
   shutter.setMaxSpeed(speed);
   shutter.setAcceleration(accel);
@@ -13,19 +14,19 @@ void shut_init(float speed, float accel) {
   shutter.enableOutputs();
 }
 
-void shut_move(long move) {
+void stepper::move(long move) {
   shutter.moveTo(move);
 }
 
-void shut_run() {
+void stepper::run() {
   shutter.run();
 }
 
-long shut_position() {
+long stepper::position() {
   return shutter.currentPosition();
 }
 
-void shut_stop() {
+void stepper::stop() {
   unsigned long startMillis;
   unsigned long currentMillis;
   shutter.stop();
@@ -41,10 +42,10 @@ void shut_stop() {
 #endif
 }
 
-void shut_set_positon(long pos) {
+void stepper::set_positon(long pos) {
   shutter.setCurrentPosition(pos);
 }
 
-bool shut_isrun() {
+bool stepper::isrun() {
   return shutter.isRunning();
 }

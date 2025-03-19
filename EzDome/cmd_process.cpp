@@ -13,53 +13,60 @@ void cmd_process(String rx) {  //Incoming serial commands from pc
   switch (cmd_type) {
     case ROT_I_EMERGENCY_STOP:
       {
-        frot_estop();
+        ctrls.rotator_estop();
         break;
       }
     case ROT_I_RESET:
       {
         ble_tx(SHUT_I_RESET, cmd_val);
-        frot_reset();
+        ctrls.reset();
         break;
       }
     case ROT_I_STOP:
       {
-        frot_stop();
+        ctrls.rotator_stop();
+        break;
+      }
+    case ROT_I_ALT:
+      {
+        ctrls.ALT_limit_check(cmd_val);
         break;
       }
     case ROT_IO_DMPOS:
       {
-        frot_DMtoSteps(cmd_val);
+        if (rot_ignore_AZ == false) {
+          ctrls.DMtoSteps(cmd_val);
+        }
         break;
       }
     case ROT_I_QUERY_POS:
       {
-        frot_transmit_DMpos(true);
+        ctrls.transmit_DMpos(true);
         break;
       }
     case ROT_I_SYNC:
       {
-        frot_sync_DM(cmd_val);
+        ctrls.sync_DM(cmd_val);
         break;
       }
     case ROT_IO_HOME:
       {
-        frot_find_home();
+        ctrls.rotator_find_home();
         break;
       }
     case ROT_I_REQUEST_INIT:
       {
-        frot_init();
+        ctrls.init();
         break;
       }
     case ROT_I_FAN:
-    {
-      frot_run_fan(cmd_val);
-      break;
-    }
+      {
+        ctrls.run_fan(cmd_val);
+        break;
+      }
     // shutter commands just transfering over BLE
     case SHUT_I_QRY_ENDSTOP:
-      {                
+      {
         ble_tx(cmd_type, cmd_val);
         break;
       }
@@ -96,7 +103,7 @@ void cmd_process(String rx) {  //Incoming serial commands from pc
     // for testing,debuging etc just for development
     case C_TEST:
       {
-        frot_es_home(frot_es_qry(false));
+        ctrls.es_home(ctrls.es_qry(false));
         break;
       }
   }

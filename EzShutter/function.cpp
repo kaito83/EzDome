@@ -1,120 +1,118 @@
+#include "function.h";
 #include "EzShutter.h";
 #include "cmd_process.h";
 #include "serial.h";
 #include "steppers.h";
-#include "ble.h";
 #include <EEPROM.h>;
-#include <BlockNot.h>;
-#include <Bounce2.h>;
-
-
 //Function layer is responsible for controll everything, like endstop watching motor moving etc..
-Bounce2::Button shut_bes_open = Bounce2::Button();
-Bounce2::Button shut_bes_close = Bounce2::Button();
 
-BlockNot fshut_bn_ping(15000);
-BlockNot fshut_bn_alarm(2000);
-BlockNot fshut_bn_stepper(500);
+f_controls ctrls;
+
+stepper stp;
+
+BlockNot bn_ping(15000);
+BlockNot bn_alarm(2000);
+BlockNot bn_stepper(500);
 
 //reboot function
 void (*resetFunc)(void) = 0;
-void fshut_reset() {
+
+void f_controls::reset() {
   resetFunc();
 }
 
+//initing endstops and buttons
+void f_controls::init_inputs() {
+  pinMode(shutter_rly_pin, OUTPUT);  // init pin for relay
+
+  bes_open.attach(shutter_espin_open, INPUT_PULLUP);
+  bes_open.interval(10);
+  bes_open.setPressedState(LOW);
+  bes_close.attach(shutter_espin_close, INPUT_PULLUP);
+  bes_close.interval(10);
+  bes_close.setPressedState(LOW);
+
+  btn_open.attach(shutter_bpin_open, INPUT_PULLUP);
+  btn_open.interval(10);
+  btn_open.setPressedState(LOW);
+  btn_close.attach(shutter_bpin_close, INPUT_PULLUP);
+  btn_close.interval(10);
+  btn_close.setPressedState(LOW);
+}
+
+//relay controll called before motor start
+void f_controls::rly_ctrl(int on_off) {
+  if (on_off == 1) {
+    sleep(50);
+  }
+  digitalWrite(shutter_rly_pin, on_off);
+}
+
 //alarm if not closed/opened successful or something hitted the endstops
-void fshut_alarm() {
-  if (fshut_bn_alarm.TRIGGERED && shut_isrun() == false) {
+void f_controls::alarm() {
+  if (bn_alarm.TRIGGERED && stp.isrun() == false) {
     if (shut_opening == true && shut_es_open == false) {
-      serial_out(SHUT_IO_OPEN, "-1", true);
+      srl.out(SHUT_IO_OPEN, "-1", true);
     }
     if (shut_opening == false && shut_es_close == false) {
-      serial_out(SHUT_IO_CLOSE, "-1", true);
+      srl.out(SHUT_IO_CLOSE, "-1", true);
     }
   }
-}
-
-//function to send ping, I'm here
-void fshut_ping() {
-  if (fshut_bn_ping.TRIGGERED) {
-    serial_out(SHUT_O_PING, "0", true);
-  }
-}
-
-//initing endstops
-void fshut_init_es() {
-  shut_bes_open.attach(shutter_espin_open, INPUT_PULLUP);
-  shut_bes_open.interval(10);
-  shut_bes_open.setPressedState(LOW);
-  shut_bes_close.attach(shutter_espin_close, INPUT_PULLUP);
-  shut_bes_close.interval(10);
-  shut_bes_close.setPressedState(LOW);
-}
-
-//moving notification
-void fshut_position() {
-  if (shut_isrun() == true && fshut_bn_stepper.TRIGGERED) {
-    //send val with 1 opening/closeing to report moving is on
-    if (shut_opening == false) {
-      serial_out(SHUT_IO_CLOSE, "1", true);
-    } else {
-      serial_out(SHUT_IO_OPEN, "1", true);
-    }
-  }
-}
-
-//function to move shutter
-void fshut_move(long pos) {
-  shut_init(shut_goto_spd, shut_acc);
-  shut_move(pos);
-}
-
-//shutter emergency stop
-void fshut_estop() {
-  shut_stop();
-  serial_out(SHUT_O_INFORMATION, "Emergency stop!", false);
-  serial_out(SHUT_I_EMERGENCY_STOP, "0", true);
 }
 
 //endstop status chechking, need multiple condition check
-bool fshut_query_es(int es, bool condition) {
+bool f_controls::query_es(int es, bool condition) {
   switch (es) {
     //two type of query
     //true if the button was pressed
     //false if the button is currently pressed
     case 0:
       {
-        shut_bes_close.update();
+        bes_close.update();
         if (condition == true)
-          return shut_bes_close.pressed();
+          return bes_close.pressed();
         else
-          return shut_bes_close.isPressed();
+          return bes_close.isPressed();
         break;
       }
     case 1:
       {
-        shut_bes_open.update();
+        bes_open.update();
         if (condition == true)
-          return shut_bes_open.pressed();
+          return bes_open.pressed();
         else
-          return shut_bes_open.isPressed();
+          return bes_open.isPressed();
         break;
       }
   }
 }
 
+//manual buttons for open/close
+void f_controls::button_monitoring() {
+  bes_close.update();
+  bes_open.update();
+  if (bes_close.pressed() == true) {
+    rly_ctrl(1);
+    stp.move(0 - shut_overlap_move);
+  }
+  if (bes_open.pressed() == true) {
+    rly_ctrl(1);
+    stp.move(shut_max_move + shut_overlap_move);
+  }
+}
+
 //similar to monitor_es without motor stop, used for instant ES check like
-void fshut_actual_es() {
-  if (fshut_query_es(0, false) == true) {
-    serial_out(SHUT_IO_CLOSE, "0", true);
+void f_controls::actual_es() {
+  if (query_es(0, false) == true) {
+    srl.out(SHUT_IO_CLOSE, "0", true);
     shut_es_open = false;
     shut_es_close = true;
   } else {
     shut_es_close = false;
     shut_es_open = true;
   }
-  if (fshut_query_es(1, false) == true) {
-    serial_out(SHUT_IO_OPEN, "0", true);
+  if (query_es(1, false) == true) {
+    srl.out(SHUT_IO_OPEN, "0", true);
     shut_es_close = false;
     shut_es_open = true;
   } else {
@@ -125,41 +123,83 @@ void fshut_actual_es() {
 
 //control function for endstops its runing in main loop, querying endstop status via fshut_query_es
 //stoping function, instantly stops the motor when endstop reached
-void fshut_monitor_es() {
-  if (fshut_query_es(0, true) == true) {
-    serial_out(SHUT_IO_CLOSE, "0", true);
-
-    shut_stop();
+void f_controls::monitor_es() {
+  if (query_es(0, true) == true) {
+    srl.out(SHUT_IO_CLOSE, "0", true);
+    stp.stop();
+    stp.set_positon(0);
     shut_es_open = false;
     shut_es_close = true;
+    rly_ctrl(0);
   }
-  if (fshut_query_es(1, true) == true) {
-    serial_out(SHUT_IO_OPEN, "0", true);
-    shut_stop();
+  if (query_es(1, true) == true) {
+    srl.out(SHUT_IO_OPEN, "0", true);
+    stp.stop();
+    stp.set_positon(shut_max_move);
     shut_es_close = false;
     shut_es_open = true;
+    rly_ctrl(0);
   }
 }
 
-//fast closing
-void fshut_emergency_close() {
-  shut_init(shut_goto_spd * shut_emergency_mult, shut_acc * shut_emergency_mult);
-  fshut_move(0);
+//function to send ping, I'm here
+void f_controls::ping() {
+  if (bn_ping.TRIGGERED) {
+    srl.out(SHUT_O_PING, "0", true);
+  }
+}
+
+//moving notification
+void f_controls::position() {
+  if (stp.isrun() == true && bn_stepper.TRIGGERED) {
+    //send val with 1 opening/closeing to report moving is on
+    if (shut_opening == false) {
+      srl.out(SHUT_IO_CLOSE, "1", true);
+    } else {
+      srl.out(SHUT_IO_OPEN, "1", true);
+    }
+  }
+}
+
+//query the position
+void f_controls::curr_pos() {
+
+  srl.out(SHUT_IO_QRY_STEPPER_POS, String(stp.position()), true);
+  srl.out(SHUT_IO_QRY_STEPPER_POS, String(stp.position()), false);
+}
+
+//function to move shutter
+void f_controls::move(long pos) {
+  stp.init(shut_goto_spd, shut_acc);
+  stp.move(pos);
+}
+
+bool f_controls::stepper_run() {
+  return stp.isrun();
+}
+
+//shutter emergency stop
+void f_controls::estop() {
+  stp.stop();
+  srl.out(SHUT_O_INFORMATION, "Emergency stop!", false);
+  srl.out(SHUT_I_EMERGENCY_STOP, "0", true);
+  rly_ctrl(0);
 }
 
 //shutter initing
-void fshut_init() {
-  serial_out(SHUT_O_INFORMATION, "Shutter initing...", false);
+void f_controls::init() {
+  srl.out(SHUT_O_INFORMATION, "Shutter initing...", false);
   //check the shutter clsoed state if was a power outage or something and couldnt close, then close it
-  if (fshut_query_es(0, false) == false) {
-    shut_init(shut_goto_spd, shut_acc);
-    shut_move(-1 * shut_max_move);
-    serial_out(SHUT_O_INFORMATION, "Shutter not closed succesfull, closing", false);
+  if (query_es(0, false) == false) {
+    stp.init(shut_goto_spd, shut_acc);
+    rly_ctrl(1);
+    stp.move(-1 * (shut_max_move + shut_overlap_move));
+    srl.out(SHUT_O_INFORMATION, "Shutter not closed succesfull, closing", false);
   } else {
     //if evertyhing was normal then setting up internal bools
     shut_opening = false;
     shut_es_open = false;
     shut_es_close = true;
   }
-  serial_out(SHUT_O_INFORMATION, version, true);  //sending fw version
+  srl.out(SHUT_O_INFORMATION, version, true);  //sending fw version
 }

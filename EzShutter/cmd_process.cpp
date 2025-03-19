@@ -12,39 +12,47 @@ void cmd_process(String rx) {  //INCOMMING CMD PROCESSING
   switch (cmd_type) {
     case SHUT_I_EMERGENCY_CLOSE:
       {
-        fshut_emergency_close();
+        ctrls.rly_ctrl(1);
+      //  ctrls.emergency_close();
         break;
       }
     case SHUT_I_EMERGENCY_STOP:
-      {
-        fshut_estop();
+      {        
+        ctrls.estop();
         break;
       }
     case SHUT_I_RESET:
       {
-        fshut_reset();
+        ctrls.reset();
         break;
       }
     case SHUT_IO_CLOSE:
       {
         shut_opening = false;
-        fshut_move(0);
+        ctrls.rly_ctrl(1);
+        ctrls.move(0 - shut_overlap_move);
         break;
       }
     case SHUT_IO_OPEN:
       {
         shut_opening = true;
-        fshut_move(shut_max_move);
+        ctrls.rly_ctrl(1);
+        ctrls.move(shut_max_move + shut_overlap_move);
         break;
       }
     case SHUT_I_QRY_ENDSTOP:
       {
-        fshut_actual_es();
+        ctrls.actual_es();
+        break;
+      }
+    case SHUT_IO_QRY_STEPPER_POS:
+      {
+        ctrls.curr_pos();
         break;
       }
     case SHUT_I_INIT:
       {
-        fshut_init();
+        ctrls.init();
         break;
       }
   }

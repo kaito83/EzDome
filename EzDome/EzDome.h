@@ -2,25 +2,30 @@
 #define EzDome_h
 #include <Arduino.h>;
 
-#define version "2.49b"
+#define version "2.70b"
 
 String getValue(String data, char separator, int index);
 
 ////CONFIG SECTION////
 //rotator const  params
-#define rot_microstp 8                  //NO Software microstepping, set on the hardware
+#define rot_microstp 8                   //NO Software microstepping, set on the hardware
 #define rot_step_rev 200 * rot_microstp  //motor steps * microsteps
-#define rot_goto_spd 1100               //speed
-#define rot_acc 250                     //acceleration
+#define rot_goto_spd 3500                //speed
+#define rot_acc 700                      //acceleration
 #define find_home_overlap_percent 1.02   //overlap during the home search
+#define rot_max_ALT 87                   //maximum ALT due to roof visibilty, if this value reached the rotator flips 180° and ignoring the azimuth until data lower than rot_max_ALT
 
 //rotator gear ratios, example big gear 1000 little 10, ratio is 1000:10 / 100:1, G1 = 100
 #define G1 36
-#define G2 4
+#define G2 10
+
+//Sensors, endstop settings
+#define rotator_es_home 34
+#define rotator_dht_pin 5
+#define rotator_dht_read 30000 //dht update, example: ms 5000 = 5 sec,
+#define rot_dht_type DHT22
 
 ////rotator pin mappings, set the right pins
-//Endstop
-#define rotator_es_home 34
 //rotator stepper
 #define rotator_en 18
 #define rotator_stp 21
@@ -48,7 +53,7 @@ String getValue(String data, char separator, int index);
 ////DONT TOUCH THESE STUFF BELOW!!!!
 ////calculated params, and other stuff, you don't have to do anything here!!!!!!!!
 #define rot_full_rotation (long)G1 * G2 * rot_step_rev
-#define rot_step_DM float(rot_full_rotation) / float(21600)  // for azimuthDM
+#define rot_step_DM float(rot_full_rotation) / float(21600)  // for azimuthDM stepping
 
 ////ROTATOR COMMANDS
 //IN
@@ -59,10 +64,11 @@ String getValue(String data, char separator, int index);
 #define ROT_I_RESET 'R'           //reset, reboot
 #define ROT_I_QUERY_POS 'Q'       //query position
 #define ROT_I_FAN 'A'             //fan controll
+#define ROT_I_ALT 'L'             //Altitude data
 
 //IN/OUT
 #define ROT_IO_DMPOS 'D'  //GOTO DM position
-#define ROT_IO_HOME 'H'   // Rotator find home
+#define ROT_IO_HOME 'H'   //Rotator find home
 
 //OUT
 #define ROT_O_PARAMS 'P'
@@ -80,7 +86,11 @@ String getValue(String data, char separator, int index);
 // 2 Rotator finding home
 // 3 Rotator reached home nothing to do
 // 4 Rotator at home, zerosearch finished, reset Rotator pos to 0
+// 5 Rotator fliped AZ ignored until ALT limit below
+// 6 Rotator return to normal AZ movement
 #define ROT_O_PING 'G'
+//DHT sensor char
+#define ROT_DHT 'T'
 
 ////SHUTTER COMMANDS
 //IN
@@ -112,5 +122,6 @@ extern bool rot_swathome;
 extern bool rot_zerosearch;
 extern bool emergency_stop;
 extern bool BLE_connected;
+extern bool rot_ignore_AZ;
 
 #endif

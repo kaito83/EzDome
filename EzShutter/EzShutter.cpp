@@ -1,7 +1,6 @@
 #include <Arduino.h>;
 #include "serial.h";
 #include "EzShutter.h";
-#include "steppers.h";
 #include "cmd_process.h";
 #include "function.h";
 #include "ble.h";
@@ -15,11 +14,11 @@ bool shut_opening;
 long shut_open_max;
 
 void setup() {
-  shut_open_max = shut_max_move;  // set the maximum opening to the real opening position
-  init_serial();                  //init Serial
-  fshut_init_es();                // init endstops
+  shut_open_max = shut_max_move;  // set the maximum opening to the real opening position  
+  srl.init();                  //init Serial
+  ctrls.init_inputs();                // init endstops
   delay(100);
-  fshut_init();  //init shutter stuff
+  ctrls.init();  //init shutter stuff
   ble_init();    // init BLE
   delay(100);
   ble_available();
@@ -28,10 +27,11 @@ void setup() {
 }
 
 void loop() {
-  fshut_ping();
-  fshut_monitor_es(); 
+  ctrls.ping();
+  ctrls.monitor_es(); 
+  ctrls.button_monitoring();
   //Incoming BLE commands just transfering to processing layer
-  ble_available();  //need to in the main loop
+  ble_available();  //need in the main loop
   if (ble_connected == true) {
     if (ble_rx_upd() == true) {
       cmd_process(ble_rx());
@@ -39,16 +39,16 @@ void loop() {
   }
   //
   //normal serial reading for USB testing and etc.
-  if (serial_available() > 0) {
+  if (srl.serial_av() > 0) {
     String shut_rx_string;
-    shut_rx_string = Serial.readStringUntil('\n\r');
+    shut_rx_string = srl.read_data();
     cmd_process(shut_rx_string);
     shut_rx_string = "";
   }
 
   if (emergency_stop == false) {
-    shut_run();
-    fshut_position();
+    ctrls.stepper_run();
+    ctrls.position();
   }
-  fshut_alarm();
+  ctrls.alarm();
 }

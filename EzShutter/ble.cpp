@@ -1,14 +1,14 @@
-#include <Arduino.h>;
+
 #include "EzShutter.h";
 #include "serial.h";
 #include "cmd_process.h";
+#include "function.h";
+#include <Arduino.h>;
 #include <ArduinoBLE.h>;
-#include <function.h>;
 
 BLECharacteristic RXCharacteristic;
 BLECharacteristic TXCharacteristic;
 BLEDevice shutter_peripheral;
-
 
 //transfer msg to rotator
 void ble_tx(String cmd) {
@@ -33,21 +33,21 @@ String ble_rx() {
 
 //Subscribe for the characteristics
 void ble_subscribe() {
-  serial_out(SHUT_O_INFORMATION, "Connecting to EzDome...", false);
+  srl.out(SHUT_O_INFORMATION, "Connecting to EzDome...", false);
   if (!shutter_peripheral.connect()) {
-    serial_out(SHUT_O_INFORMATION, "Can't connect to EzDome, retrying...", false);
+    srl.out(SHUT_O_INFORMATION, "Can't connect to EzDome, retrying...", false);
   }
   if (!shutter_peripheral.discoverAttributes()) {
-    serial_out(SHUT_O_INFORMATION, "Didn't discover attributes", false);
+    srl.out(SHUT_O_INFORMATION, "Didn't discover attributes", false);
     shutter_peripheral.disconnect();
   }
   RXCharacteristic = shutter_peripheral.characteristic(BLE_RXUID);
   TXCharacteristic = shutter_peripheral.characteristic(BLE_TXUID);
   if (RXCharacteristic.canSubscribe() && TXCharacteristic.canSubscribe()) {
-    serial_out(SHUT_O_INFORMATION, "EzShutter can subscribe", false);
+    srl.out(SHUT_O_INFORMATION, "EzShutter can subscribe", false);
     ble_connected = false;
     if (RXCharacteristic.subscribe() && TXCharacteristic.subscribe()) {
-      serial_out(SHUT_O_INFORMATION, "EzShutter subscribed", false);
+      srl.out(SHUT_O_INFORMATION, "EzShutter subscribed", false);
       ble_connected = true;
     }
   }
@@ -58,7 +58,7 @@ void ble_available() {
   shutter_peripheral = BLE.available();
   if (shutter_peripheral) {
     if (shutter_peripheral.localName() == BLE_NAME) {
-      serial_out(SHUT_O_INFORMATION, String(BLE_NAME) + " found", false);
+      srl.out(SHUT_O_INFORMATION, String(BLE_NAME) + " found", false);
       BLE.stopScan();
       ble_subscribe();
     }
@@ -68,14 +68,14 @@ void ble_available() {
 
 void ble_connect(BLEDevice rotator_service) {
   //if BLE connected send actual status of shutter
-  fshut_actual_es();
+  ctrls.actual_es();
   ble_connected = true;
 }
 
 
 void ble_disconnected(BLEDevice rotator_service) {
   ble_connected = false;
-  serial_out(SHUT_O_INFORMATION, "Disconnected", false);
+  srl.out(SHUT_O_INFORMATION, "Disconnected", false);
 }
 
 //Initing and starting BLE device
@@ -85,5 +85,5 @@ void ble_init() {
   BLE.setEventHandler(BLEDisconnected, ble_disconnected);
   BLE.setEventHandler(BLEConnected, ble_connect);
   BLE.scanForUuid(BLE_ROTUID);
-  serial_out(SHUT_O_INFORMATION, "EzRotator scaning for " + String(BLE_NAME), false);
+  srl.out(SHUT_O_INFORMATION, "EzRotator scaning for " + String(BLE_NAME), false);
 }

@@ -2,7 +2,7 @@
 #include "EzDome.h";
 #include "function.h";
 #include "serial.h";
-#include <ArduinoBLE.h>
+#include <ArduinoBLE.h>;
 
 String prev_rx;
 
@@ -31,13 +31,13 @@ String ble_rx() {
 
 void ble_disconnected(BLEDevice rotator_service) {
   BLE_connected = false;
-  serial_out(SHUT_O_INFORMATION, "0");
+  srl.out(SHUT_O_INFORMATION, "0");
 }
 
 void ble_connected(BLEDevice rotator_service) {
   BLE_connected = true;
   ble_tx(SHUT_I_QRY_ENDSTOP, "0");
-  serial_out(SHUT_O_INFORMATION, "1");
+  srl.out(SHUT_O_INFORMATION, "1");
 }
 
 void ble_init() {
@@ -53,7 +53,7 @@ void ble_init() {
   TXCharacteristic.writeValue("0");
   RXCharacteristic.writeValue("0");
   BLE.advertise();
-  serial_out(SHUT_O_INFORMATION, "2");
+  srl.out(SHUT_O_INFORMATION, "2");
 }
 
 void ble_central_connected() {

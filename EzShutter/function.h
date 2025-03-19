@@ -1,18 +1,34 @@
 #ifndef function_h
 #define function_h
 
-void fshut_init();
-void fshut_reset();
-void fshut_move(long pos);
-void fshut_estop();
-void fshut_monitor_es();
-void fshut_actual_es();
-void fshut_position();
-void fshut_status();
-void fshut_transfer_cmd(char cmd_ty, String cmd_val, bool ble, bool trig);
-void fshut_emergency_close();
-void fshut_init_es();
-void fshut_ping();
-void fshut_alarm();
+#include <BlockNot.h>;
+#include <Bounce2.h>;
 
+class f_controls {
+private:
+  Bounce2::Button bes_open = Bounce2::Button();
+  Bounce2::Button bes_close = Bounce2::Button();
+  Bounce2::Button btn_open = Bounce2::Button();
+  Bounce2::Button btn_close = Bounce2::Button();
+public:
+  void init();
+  void init_inputs();
+  void reset();
+  void move(long pos);
+  void position();
+  void curr_pos();
+  void estop();
+  void emergency_close();  
+  void monitor_es();
+  void actual_es();
+  void button_monitoring();
+  void alarm();
+  void rly_ctrl(int on_off);
+  void ping();
+  bool stepper_run();
+private:
+  bool query_es(int es, bool condition);
+};
+
+extern f_controls ctrls;
 #endif

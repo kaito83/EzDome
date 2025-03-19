@@ -1,30 +1,31 @@
-#include <Arduino.h>;
+#include "serial.h";
 #include "EzDome.h";
 #include <BlockNot.h>;
 #include <FIFObuf.h>;
 
+serial_c srl;
 //limiting buffer send rate to 50ms
 BlockNot serial_trig(50);
 //FIFO to store commands
 FIFObuf<String> ser_fifo(30);
 
 //starting serial communication
-void init_serial() {
+void serial_c::init() {
   Serial.begin(9600);
   Serial.setTimeout(100);
 }
 
 //check if serial is ready
-int serial_available() {
+int serial_c::available() {
   return Serial.available();
 }
 
 //reading commands from PC
-String serial_readStringUntil() {
+String serial_c::read_data() {
   return Serial.readStringUntil('\n\r');
 }
 
-void ser_popbuf() {
+void serial_c::popbuf() {
   String pop;
   if ((serial_trig.TRIGGERED) && (ser_fifo.size() > 0)) {
     pop = ser_fifo.pop();
@@ -35,6 +36,6 @@ void ser_popbuf() {
   }
 }
 
-void serial_out(char cmd_type, String cmd_val) {
+void serial_c::out(char cmd_type, String cmd_val) {
   ser_fifo.push(String(cmd_type) + DELIMITER + cmd_val);
 }
