@@ -33,12 +33,7 @@ Set your pinouts in EzDome.h, EzShutter.h and other settings (only end of Config
 Flashing with Arduino IDE, choose ESP32 Dev module, 240Mhz Wifi/BT, flash mode DIO.
 
 Serial communication bitrate: 9600
-
 ------------
-EzDome.exe - Native UI also can connect to mount
-
-EzDome Setup.exe - ASCOM driver
-
 Updates:
 
 Firmwares
@@ -49,14 +44,14 @@ Rotator:
 
 Shutter:
 - Code rework
-- Added function to controll relay for cut power from driver, to reduce battery consumption
+- Added function to controll relay for cut power off from TMC driver, to reduce battery consumption
 - Added external open/close function
 
 Stand alone UI (EzDome.exe):
 - Added UDP server to commicate with ASCOM driver
 - ALT limit function can be enabled
 - DHT sensor data
-- Port number for only can be modified in registry, now (Computer\HKEY_CURRENT_USER\SOFTWARE\EzDome)
+- Port number for only can be modified in registry now (Computer\HKEY_CURRENT_USER\SOFTWARE\EzDome)
 - Slave mode removed from UI, use ASCOM to controll it 
 
 ASCOM driver:
@@ -65,7 +60,8 @@ ASCOM driver:
 
 More functions and redesigns may comming!
 
-**Full Changelog**: https://github.com/kaito83/EzDome/commits/v2
+EzDome.exe - Native UI with UDP server to communicate with ASCOM driver
+EzDome Setup.exe - ASCOM driver
 
 
 
