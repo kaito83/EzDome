@@ -36,7 +36,6 @@ Serial communication bitrate: 9600
 ------------
 Updates:
 
-Firmwares
 Rotator:
 - Code rework
 - Added new function to read DHT sensor
