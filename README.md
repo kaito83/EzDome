@@ -1,9 +1,6 @@
 # EzDome
 Free open source observatory Dome firmware with ASCOM support and Native UI.
 
-UPDATE, please use V2 branch, and read changes!
-https://github.com/kaito83/EzDome/releases/tag/EzDome_V2
-
 This project was created because I couldn't find any reasonable free firmware for observatory control.
 It doesn't include any fancy features, like Ethernet connection and an off-grid system for power outages.
 It only knows what I needed.
@@ -41,5 +38,35 @@ Serial communication bitrate: 9600
 EzDome.exe - Native UI also can connect to mount
 
 EzDome Setup.exe - ASCOM driver
+
+Updates:
+
+Firmwares
+Rotator:
+- Code rework
+- Added new function to read DHT sensor
+- Added ALT limit function
+
+Shutter:
+- Code rework
+- Added function to controll relay for cut power from driver, to reduce battery consumption
+- Added external open/close function
+
+Stand alone UI (EzDome.exe):
+- Added UDP server to commicate with ASCOM driver
+- ALT limit function can be enabled
+- DHT sensor data
+- Port number for only can be modified in registry, now (Computer\HKEY_CURRENT_USER\SOFTWARE\EzDome)
+- Slave mode removed from UI, use ASCOM to controll it 
+
+ASCOM driver:
+- Code full rework
+- I hate VC components (to ugly for me) it's not stande alone anymore, external exe need to controll the dome, communication via UDP, default is port 9999 it can be any, look above
+
+More functions and redesigns may comming!
+
+**Full Changelog**: https://github.com/kaito83/EzDome/commits/v2
+
+
 
 ![image](https://github.com/user-attachments/assets/0c31f90e-cfdd-480d-a439-4fe2661a7a81)
