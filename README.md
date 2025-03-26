@@ -45,11 +45,9 @@ Stand alone UI (EzDome.exe):
 - DHT sensor data
 - Port number for only can be modified in registry now (Computer\HKEY_CURRENT_USER\SOFTWARE\EzDome)
 
-ASCOM driver:
+ASCOM driver(EzDome Setup.exe):
 - I hate VC components (to ugly for me) it's not stande alone anymore, external exe need to controll the dome, communication via UDP, default is port 9999 it can be any, look above
 
 More functions and redesigns may comming!
 
-EzDome.exe - Native UI with UDP server to communicate with ASCOM driver
-EzDome Setup.exe - ASCOM driver
-
+![Untitled](https://github.com/user-attachments/assets/19ba08c0-2fa1-436f-8312-f864018e1b65)
