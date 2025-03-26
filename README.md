@@ -53,4 +53,3 @@ More functions and redesigns may comming!
 EzDome.exe - Native UI with UDP server to communicate with ASCOM driver
 EzDome Setup.exe - ASCOM driver
 
-![image](https://github.com/user-attachments/assets/0c31f90e-cfdd-480d-a439-4fe2661a7a81)
