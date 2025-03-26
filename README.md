@@ -21,11 +21,15 @@ EzDome(rotator):
   -   Home find, shortest route on GOTO
   -   PWM controll for fan or etc.
   -   Etc, what a simple Dome needs to know
+  -   ALT limit function
+  -   DHT sensor data
     
 EzShutter(Shutter, rolo, window etc):
   -   Opening / closing with endstops
   -   Movement check with error report
   -   EzShutter can work as standalone if just want roll-off observatory
+  -   Function to controll relay for cut power off from TMC driver, to reduce battery consumption
+  -   External open/close function
 
 
 In Arduino IDE download the necessary libraries.
@@ -34,34 +38,19 @@ Flashing with Arduino IDE, choose ESP32 Dev module, 240Mhz Wifi/BT, flash mode D
 
 Serial communication bitrate: 9600
 ------------
-Updates:
-
-Rotator:
-- Code rework
-- Added new function to read DHT sensor
-- Added ALT limit function
-
-Shutter:
-- Code rework
-- Added function to controll relay for cut power off from TMC driver, to reduce battery consumption
-- Added external open/close function
 
 Stand alone UI (EzDome.exe):
-- Added UDP server to commicate with ASCOM driver
+- UDP server to commicate with ASCOM driver
 - ALT limit function can be enabled
 - DHT sensor data
 - Port number for only can be modified in registry now (Computer\HKEY_CURRENT_USER\SOFTWARE\EzDome)
-- Slave mode removed from UI, use ASCOM to controll it 
 
 ASCOM driver:
-- Code full rework
 - I hate VC components (to ugly for me) it's not stande alone anymore, external exe need to controll the dome, communication via UDP, default is port 9999 it can be any, look above
 
 More functions and redesigns may comming!
 
 EzDome.exe - Native UI with UDP server to communicate with ASCOM driver
 EzDome Setup.exe - ASCOM driver
-
-
 
 ![image](https://github.com/user-attachments/assets/0c31f90e-cfdd-480d-a439-4fe2661a7a81)
