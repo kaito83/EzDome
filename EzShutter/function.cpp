@@ -169,7 +169,6 @@ void f_controls::position() {
 
 //query the position
 void f_controls::curr_pos() {
-
   srl.out(SHUT_IO_QRY_STEPPER_POS, String(stp.position()), true);
   srl.out(SHUT_IO_QRY_STEPPER_POS, String(stp.position()), false);
 }
@@ -183,7 +182,6 @@ void f_controls::move(long pos) {
 bool f_controls::stepper_isrun() {
   return stp.isrun();
 }
-
 
 void f_controls::stepper_run() {
   stp.run();

@@ -14,9 +14,9 @@ bool shut_opening;
 long shut_open_max;
 
 void setup() {
-  shut_open_max = shut_max_move;  // set the maximum opening to the real opening position  
-  srl.init();                  //init Serial
-  ctrls.init_inputs();                // init endstops
+  shut_open_max = shut_max_move;  // set the maximum opening to the real opening position
+  srl.init();                     //init Serial
+  ctrls.init_inputs();            // init endstops
   delay(100);
   ctrls.init();  //init shutter stuff
   ble_init();    // init BLE
@@ -28,8 +28,14 @@ void setup() {
 
 void loop() {
   ctrls.ping();
-  ctrls.monitor_es(); 
+  ctrls.monitor_es();
   ctrls.button_monitoring();
+  if (emergency_stop == false) {
+    ctrls.stepper_run();
+    ctrls.position();
+  }
+  ctrls.alarm();
+  
   //Incoming BLE commands just transfering to processing layer
   ble_available();  //need in the main loop
   if (ble_connected == true) {
@@ -45,10 +51,4 @@ void loop() {
     cmd_process(shut_rx_string);
     shut_rx_string = "";
   }
-
-  if (emergency_stop == false) {
-    ctrls.stepper_run();
-    ctrls.position();
-  }
-  ctrls.alarm();
 }

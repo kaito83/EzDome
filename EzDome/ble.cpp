@@ -8,7 +8,7 @@ String prev_rx;
 
 BLEService rotator_service(BLE_ROTUID);
 BLEStringCharacteristic TXCharacteristic(BLE_TXUID, BLEWrite | BLERead | BLENotify, 20);
-BLEStringCharacteristic RXCharacteristic(BLE_RXUID, BLEWrite | BLERead | BLENotify, 20);
+BLEStringCharacteristic RXCharacteristic(BLE_RXUID, BLEWrite | BLERead | BLENotify | BLEWriteWithoutResponse, 20);
 
 void ble_tx(char cmd_type, String cmd_val) {
   String tx_cmd;
@@ -19,13 +19,30 @@ void ble_tx(char cmd_type, String cmd_val) {
 }
 
 String ble_rx() {
-  String val_rx;
+  /* String val_rx;
   if (RXCharacteristic.written() == true) {
     val_rx = RXCharacteristic.value();
     if (prev_rx != val_rx)
       return val_rx;
   }
   prev_rx = val_rx;
+  return "";
+*/
+  String val_rx;
+  byte rxBuffer[20];  // Max BLE adatméret
+
+  int len = RXCharacteristic.valueLength();  // Adat hosszának lekérése
+  if (len > 0) {
+    RXCharacteristic.readValue(rxBuffer, len);  // Adat kiolvasása
+    rxBuffer[len] = '\0';                       // Null terminátor (ha szöveg)
+    val_rx = String((char*)rxBuffer);
+
+    if (prev_rx != val_rx) {
+      prev_rx = val_rx;
+      return val_rx;  // Csak ha új adat jött
+    }
+  }
+
   return "";
 }
 

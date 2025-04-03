@@ -23,9 +23,9 @@ String serial_c::read_data() {
 void serial_c::out(char cmd_type, String cmd_val, bool ble) {
   String cmd;
   cmd = String(cmd_type) + DELIMITER + cmd_val;
-  if (ble_connected == true && ble == true)
+  if (ble_connected == true && ble == true) {
     ble_tx(cmd);
-  else {
+  } else {
     Serial.availableForWrite();
     Serial.println(cmd);
   }

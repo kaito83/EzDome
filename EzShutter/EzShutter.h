@@ -15,15 +15,15 @@
 ////shutter pin mappings, set the right pins (mine is CNC sheild v3 with wemos d1)
 //enstops
 #define shutter_espin_open 14
-#define shutter_espin_close 27
+#define shutter_espin_close 17//27
 //buttons
 #define shutter_bpin_open 19 
 #define shutter_bpin_close 21
 
 //shutter stepper settings
-#define shutter_en 33
-#define shutter_stp 25
-#define shutter_dir 26
+#define shutter_en 12//33
+#define shutter_stp 25//25
+#define shutter_dir 27//26
 #define shutter_en_invert true
 #define shutter_stp_invert false
 #define shutter_dir_invert false
@@ -49,7 +49,6 @@
 #define SHUT_I_RESET 'r'  //reboot system
 #define SHUT_I_QRY_ENDSTOP 'q' //used for querying endstop
 
-
 //N/OUT
 #define SHUT_IO_CLOSE 'c' //OUT command value closing start 1, 0 closed, -1 endstop not engage
 #define SHUT_IO_OPEN 'o'  // OUT command value opening start 1, 0 opened, -1 endstop not engage
@@ -74,7 +73,4 @@ extern bool shut_es_close;
 extern bool emergency_stop;
 extern bool shut_opening; // false when closing true when opening
 extern bool ble_connected;
-
-
-
 #endif
