@@ -6,13 +6,13 @@ class stepper {
 private:
 
 public:
-  void init(float speed, float accel);
+  void init(int speed, int accel);
   void move(long move);
-  void run();
-  void disable(bool S);
+
   void set_positon(long pos);
   long position();
   bool isrun();
-  void stop();
+  void forcestop();
+  void softstop();
 };
 #endif

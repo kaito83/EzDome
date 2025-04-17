@@ -40,9 +40,9 @@ void f_controls::init_inputs() {
   btn_close.setPressedState(LOW);
 }
 
-//relay controll called before motor start
-void f_controls::rly_ctrl(int on_off) {
-  if (on_off == 1) {
+//relay controll, this called before motor start
+void f_controls::rly_ctrl(bool on_off) {
+  if (on_off == true) {
     delay(50);
   }
   digitalWrite(shutter_rly_pin, on_off);
@@ -87,27 +87,39 @@ bool f_controls::query_es(int es, bool condition) {
   }
 }
 
+//function to move shutter
+void f_controls::move(long pos) {
+  //prevent to over moves
+  // if (((pos >= (0 - shut_overlap_move)) && !shut_es_close) || ((pos <= (shut_max_move + shut_overlap_move)) && !shut_es_open)) {
+  if (((pos >= (0)) && !shut_es_close) || ((pos <= (shut_max_move)) && !shut_es_open)) {
+    rly_ctrl(1);
+    stp.move(pos);
+  }
+}
+
 //manual buttons for open/close
 void f_controls::button_monitoring() {
   btn_close.update();
   btn_open.update();
-  if (btn_close.pressed() == true) {
+  if (btn_close.pressed()) {
     shut_opening = false;
     rly_ctrl(1);
     delay(50);
-    stp.init(shut_goto_spd, shut_acc);
-    stp.move(0 - shut_overlap_move);
+    move(0 - shut_overlap_move);
   }
-  if (btn_open.pressed() == true) {
+  if (btn_open.pressed()) {
     shut_opening = true;
     rly_ctrl(1);
     delay(50);
-    stp.init(shut_goto_spd, shut_acc);
-    stp.move(shut_max_move + shut_overlap_move);
+    move(shut_max_move + shut_overlap_move);
+  }
+  if (btn_open.isPressed() && btn_close.isPressed()) {
+    stp.softstop();
+    rly_ctrl(0);
   }
 }
 
-//similar to monitor_es without motor stop, used for instant ES check like
+//similar to monitor_es without motor stop, used for instant endstop check
 void f_controls::actual_es() {
   if (query_es(0, false) == true) {
     srl.out(SHUT_IO_CLOSE, "0", true);
@@ -127,24 +139,24 @@ void f_controls::actual_es() {
   }
 }
 
-//control function for endstops its runing in main loop, querying endstop status via fshut_query_es
-//stoping function, instantly stops the motor when endstop reached
+//control function for endstops its runing in main loop, querying endstop status via query_es
+//stoping function, instantly stops the motor when endstop reached, and set default position 0 for closed, shut_max_move for open
 void f_controls::monitor_es() {
   if (query_es(0, true) == true) {
     srl.out(SHUT_IO_CLOSE, "0", true);
-    stp.stop();
-    stp.set_positon(0);
+    stp.forcestop();
     shut_es_open = false;
     shut_es_close = true;
     rly_ctrl(0);
+    stp.set_positon(0);
   }
   if (query_es(1, true) == true) {
     srl.out(SHUT_IO_OPEN, "0", true);
-    stp.stop();
-    stp.set_positon(shut_max_move);
+    stp.forcestop();
     shut_es_close = false;
     shut_es_open = true;
     rly_ctrl(0);
+    stp.set_positon(shut_max_move);
   }
 }
 
@@ -173,23 +185,9 @@ void f_controls::curr_pos() {
   srl.out(SHUT_IO_QRY_STEPPER_POS, String(stp.position()), false);
 }
 
-//function to move shutter
-void f_controls::move(long pos) {
-  stp.init(shut_goto_spd, shut_acc);
-  stp.move(pos);
-}
-
-bool f_controls::stepper_isrun() {
-  return stp.isrun();
-}
-
-void f_controls::stepper_run() {
-  stp.run();
-}
-
 //shutter emergency stop
 void f_controls::estop() {
-  stp.stop();
+  stp.forcestop();
   srl.out(SHUT_O_INFORMATION, "Emergency stop!", false);
   srl.out(SHUT_I_EMERGENCY_STOP, "0", true);
   rly_ctrl(0);
@@ -198,9 +196,9 @@ void f_controls::estop() {
 //shutter initing
 void f_controls::init() {
   srl.out(SHUT_O_INFORMATION, "Shutter initing...", false);
-  //check the shutter clsoed state if was a power outage or something and couldnt close, then close it
+  stp.init(shut_goto_spd, shut_acc);
+  //check the shutter clsoed state, if was a power outage or something and couldnt close, then close it, its not controlled by f_controls::move
   if (query_es(0, false) == false) {
-    stp.init(shut_goto_spd, shut_acc);
     rly_ctrl(1);
     stp.move(-1 * (shut_max_move + shut_overlap_move));
     srl.out(SHUT_O_INFORMATION, "Shutter not closed succesfull, closing", false);

@@ -19,30 +19,18 @@ void ble_tx(char cmd_type, String cmd_val) {
 }
 
 String ble_rx() {
-  /* String val_rx;
-  if (RXCharacteristic.written() == true) {
-    val_rx = RXCharacteristic.value();
-    if (prev_rx != val_rx)
-      return val_rx;
-  }
-  prev_rx = val_rx;
-  return "";
-*/
   String val_rx;
-  byte rxBuffer[20];  // Max BLE adatméret
-
-  int len = RXCharacteristic.valueLength();  // Adat hosszának lekérése
+  byte rxBuffer[20];
+  int len = RXCharacteristic.valueLength();
   if (len > 0) {
-    RXCharacteristic.readValue(rxBuffer, len);  // Adat kiolvasása
-    rxBuffer[len] = '\0';                       // Null terminátor (ha szöveg)
+    RXCharacteristic.readValue(rxBuffer, len);
+    rxBuffer[len] = '\0';
     val_rx = String((char*)rxBuffer);
-
     if (prev_rx != val_rx) {
       prev_rx = val_rx;
-      return val_rx;  // Csak ha új adat jött
+      return val_rx;
     }
   }
-
   return "";
 }
 

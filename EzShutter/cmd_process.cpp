@@ -1,7 +1,8 @@
 #include <Arduino.h>;
-#include "EzShutter.h";
 #include "function.h";
-#include "ble.h";
+#include "EzShutter.h";
+
+//cmd processing layer
 
 void cmd_process(String rx) {  //INCOMMING CMD PROCESSING
   char cmd_type;
@@ -12,12 +13,13 @@ void cmd_process(String rx) {  //INCOMMING CMD PROCESSING
   switch (cmd_type) {
     case SHUT_I_EMERGENCY_CLOSE:
       {
-        ctrls.rly_ctrl(1);
-      //  ctrls.emergency_close();
+        // Dunno is this necessary, so not implemented yet
+       // ctrls.rly_ctrl(1);
+        //  ctrls.emergency_close();
         break;
       }
     case SHUT_I_EMERGENCY_STOP:
-      {        
+      {
         ctrls.estop();
         break;
       }
@@ -29,14 +31,12 @@ void cmd_process(String rx) {  //INCOMMING CMD PROCESSING
     case SHUT_IO_CLOSE:
       {
         shut_opening = false;
-        ctrls.rly_ctrl(1);
         ctrls.move(0 - shut_overlap_move);
         break;
       }
     case SHUT_IO_OPEN:
       {
         shut_opening = true;
-        ctrls.rly_ctrl(1);
         ctrls.move(shut_max_move + shut_overlap_move);
         break;
       }
@@ -53,6 +53,11 @@ void cmd_process(String rx) {  //INCOMMING CMD PROCESSING
     case SHUT_I_INIT:
       {
         ctrls.init();
+        break;
+      }
+    case C_TEST:
+      {
+      //  ctrls.setpos();
         break;
       }
   }

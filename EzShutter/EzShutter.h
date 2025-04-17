@@ -2,34 +2,32 @@
 #define EzDome_h
 #include <Arduino.h>;
 
-#define version "2.1b"
+#define version "2.3b"
 
 ////All consts/defins need to be seted!!!!!!!!!
 //shutter const  params
-#define shut_goto_spd 3000
+#define shut_goto_spd 3500
 #define shut_acc 800
-#define shut_max_move (long)246500
-#define shut_emergency_mult 10 //case of emergency close, multiply the base acc/speed
-#define shut_overlap_move 700 //this parameter added to open & close maximum positons to prevent unwatented endstop switch failer overlap
+#define shut_max_move 246500L // L letter is necessary = long 
+#define shut_overlap_move 700 //this parameter added to open & close maximum positons to prevent unwatented endstop switch failer during movement, with overlap
 
-////shutter pin mappings, set the right pins (mine is CNC sheild v3 with wemos d1)
+////shutter pin mappings, set the right pins
 //enstops
 #define shutter_espin_open 14
-#define shutter_espin_close 17//27
+#define shutter_espin_close 27
 //buttons
 #define shutter_bpin_open 19 
 #define shutter_bpin_close 21
 
 //shutter stepper settings
-#define shutter_en 12//33
+#define shutter_en 33//12//33
 #define shutter_stp 25//25
-#define shutter_dir 27//26
+#define shutter_dir 26//27//26
 #define shutter_en_invert true
 #define shutter_stp_invert false
-#define shutter_dir_invert false
-#define shutter_mot_auto_poff // automatic motor power off higly recommended to power save, uncomment if disable
+#define shutter_dir_invert true
 
-//relay controll, for cutoff power for tmc2160
+//relay controll, for cutoff power from tmc2160, to minimize power consumption
 #define shutter_rly_pin 23
 
 #define BLE_NAME "EzDome" //this MUST be the same in EzDome

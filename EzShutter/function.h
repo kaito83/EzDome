@@ -22,13 +22,11 @@ public:
   void monitor_es();
   void actual_es();
   void button_monitoring();
-  void alarm();
-  void rly_ctrl(int on_off);
+  void alarm();  
   void ping();
-  void stepper_run();
-  bool stepper_isrun();
 private:
   bool query_es(int es, bool condition);
+  void rly_ctrl(bool on_off);
 };
 
 extern f_controls ctrls;

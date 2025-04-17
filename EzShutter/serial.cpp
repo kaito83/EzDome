@@ -19,12 +19,12 @@ String serial_c::read_data() {
   return Serial.readStringUntil('\n\r');
 }
 
-//Serial out if BLE not connected transfer over BLE
+//Serial out if BLE not connected else transfer over BLE
 void serial_c::out(char cmd_type, String cmd_val, bool ble) {
   String cmd;
   cmd = String(cmd_type) + DELIMITER + cmd_val;
   if (ble_connected == true && ble == true) {
-    ble_tx(cmd);
+    ble::tx(cmd);
   } else {
     Serial.availableForWrite();
     Serial.println(cmd);

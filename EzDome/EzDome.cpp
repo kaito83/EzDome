@@ -54,7 +54,6 @@ void loop() {
     ctrls.cmd_tranfser(ble_rx());
   }
   if (emergency_stop == false) {
-    ctrls.rotator_run();
     ctrls.transmit_DMpos(false);
   }
   ctrls.es_home(ctrls.es_qry(true));

@@ -2,7 +2,7 @@
 #define EzDome_h
 #include <Arduino.h>;
 
-#define version "2.70b"
+#define version "2.80b"
 
 String getValue(String data, char separator, int index);
 
@@ -23,16 +23,16 @@ String getValue(String data, char separator, int index);
 #define rotator_es_home 34
 #define rotator_dht_pin 5
 #define rotator_dht_read 30000 //dht update, example: ms 5000 = 5 sec,
-#define rot_dht_type DHT22
+#define rotator_dht_type DHT22
 
 ////rotator pin mappings, set the right pins
 //rotator stepper
-#define rotator_en 18
-#define rotator_stp 21
-#define rotator_dir 19
+#define rotator_en 18 //12 testbaord
+#define rotator_stp 21 //25 testboard
+#define rotator_dir 19 //27 testbpard
 #define rotator_en_invert true
 #define rotator_stp_invert false
-#define rotator_dir_invert true
+#define rotator_dir_invert false
 
 //fan pin pwm pins
 #define fan0_PWM 32

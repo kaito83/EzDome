@@ -19,7 +19,6 @@ public:
   void run_fan(String speed);
   void ALT_limit_check(String ALT);
   void dht_read();
-  void rotator_run();
   void rotator_init();
   void rotator_stop();
   void rotator_find_home();

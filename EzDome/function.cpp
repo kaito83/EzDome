@@ -20,13 +20,13 @@ BlockNot frot_bn_BLE(5000);
 //DHT reading 1min you can change this
 BlockNot frot_bn_dht(long(rotator_dht_read));
 //sending the stepper position frequency is calculated, to reduce load
-BlockNot fshut_bn_stepper(round(rot_full_rotation / rot_goto_spd) - (round(rot_full_rotation / rot_goto_spd) / 10));
+BlockNot fshut_bn_trans_pos(round(rot_full_rotation / rot_goto_spd) - (round(rot_full_rotation / rot_goto_spd) / 10));
 
 //endstop check with bounce
 Bounce2::Button shut_bes_home = Bounce2::Button();
 
 //humidity and temp sensor
-DHT dht(rotator_dht_pin, rot_dht_type);
+DHT dht(rotator_dht_pin, rotator_dht_type);
 
 
 String DMSEP = ":";
@@ -133,9 +133,7 @@ bool f_controls::es_qry(bool condition) {
     return shut_bes_home.isPressed();
   }
 }
-void f_controls::rotator_run() {
-  stp.run();
-}
+
 
 void f_controls::rotator_init() {
   stp.init(rot_goto_spd, rot_acc);
@@ -166,13 +164,14 @@ void f_controls::stepToDM(long pos) {
   if (mm >= 21600.000)
     mm -= 21600.000;
   s_pos = String(int(trunc(mm / 60))) + DMSEP + String(int(trunc(modf(mm / 60, &fr) * 60)));
+ // srl.out(C_TEST, String(pos));
   srl.out(ROT_IO_DMPOS, s_pos);
 }
 
 //transmitting rotator position
 void f_controls::transmit_DMpos(bool qry_pos) {
   //transmit if runing with triggered calc
-  if (stp.isrun() == true && fshut_bn_stepper.TRIGGERED) {
+  if (stp.isrun() == true && fshut_bn_trans_pos.TRIGGERED) {
     stepToDM(stp.position());
   }
   //used for quering the position
@@ -185,10 +184,12 @@ void f_controls::transmit_DMpos(bool qry_pos) {
 void f_controls::sync_DM(String dm) {
   int ddd;
   int mm;
-  ddd = getValue(dm, DMSEP_C, 0).toInt();
-  mm = getValue(dm, DMSEP_C, 1).toInt();
-  stp.set_positon((60 * ddd * rot_step_DM) + (mm * rot_step_DM));
-  ctrls.transmit_DMpos(true);
+  if (stp.isrun() == false) {
+    ddd = getValue(dm, DMSEP_C, 0).toInt();
+    mm = getValue(dm, DMSEP_C, 1).toInt();
+    stp.set_positon((60 * ddd * rot_step_DM) + (mm * rot_step_DM));
+    ctrls.transmit_DMpos(true);
+  }
 }
 
 // rotator 180° flipping function
@@ -206,6 +207,7 @@ void f_controls::ALT_flip() {
 //disable AZ coordinates until the ALT lower than rot_max_ALT, called from cmd_proccess
 void f_controls::ALT_limit_check(String ALT) {
   if (ALT.toInt() >= rot_max_ALT) {
+
     //flip called once, and set rot_ignore_AZ to true
     ALT_flip();
     rot_ignore_AZ = true;
@@ -237,6 +239,7 @@ void f_controls::rotator_estop() {
 void f_controls::rotator_stop() {
   stp.stop();
   srl.out(ROT_O_INFORMATION, "1");
+  return;
 }
 
 //used for homing

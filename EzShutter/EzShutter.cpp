@@ -19,11 +19,11 @@ void setup() {
   ctrls.init_inputs();            // init endstops
   delay(100);
   ctrls.init();  //init shutter stuff
-  ble_init();    // init BLE
+  ble::init();    // init BLE
   delay(100);
-  ble_available();
+  ble::available();
   delay(100);
-  ble_subscribe();
+  ble::subscribe();
 }
 
 void loop() {
@@ -31,16 +31,15 @@ void loop() {
   ctrls.monitor_es();
   ctrls.button_monitoring();
   if (emergency_stop == false) {
-    ctrls.stepper_run();
     ctrls.position();
   }
   ctrls.alarm();
   
   //Incoming BLE commands just transfering to processing layer
-  ble_available();  //need in the main loop
+  ble::available();  //need in the main loop
   if (ble_connected == true) {
-    if (ble_rx_upd() == true) {
-      cmd_process(ble_rx());
+    if (ble::rx_upd() == true) {
+      cmd_process(ble::rx());
     }
   }
   //
