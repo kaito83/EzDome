@@ -90,8 +90,8 @@ bool f_controls::query_es(int es, bool condition) {
 //function to move shutter
 void f_controls::move(long pos) {
   //prevent to over moves
-  // if (((pos >= (0 - shut_overlap_move)) && !shut_es_close) || ((pos <= (shut_max_move + shut_overlap_move)) && !shut_es_open)) {
-  if (((pos >= (0)) && !shut_es_close) || ((pos <= (shut_max_move)) && !shut_es_open)) {
+  if (((pos >= (0 - shut_overlap_move)) && !shut_es_close) || ((pos <= (shut_max_move + shut_overlap_move)) && !shut_es_open)) {
+    //if (((pos >= (0)) && !shut_es_close) || ((pos <= (shut_max_move)) && !shut_es_open)) {
     rly_ctrl(1);
     stp.move(pos);
   }
@@ -115,7 +115,6 @@ void f_controls::button_monitoring() {
   }
   if (btn_open.isPressed() && btn_close.isPressed()) {
     stp.softstop();
-    rly_ctrl(0);
   }
 }
 

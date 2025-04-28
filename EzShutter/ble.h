@@ -1,16 +1,12 @@
-#ifndef BLE_H
-#define BLE_H
+#ifndef ble_h
+#define ble_h
 
-#include <Arduino.h>;
-
-namespace ble {
-  void init();
-  void available();
-  void subscribe();
-  void tx(String cmd);
-  String rx();
-  bool rx_upd();
-  void poll();
-}
+void ble_init();
+void ble_available();
+void ble_subscribe();
+void ble_tx(String cmd);
+String ble_rx();
+bool ble_rx_upd();
+void ble_poll();
 
 #endif
