@@ -39,31 +39,32 @@
 
 ////DONT TOUCH THESE STUFF BELOW!!!!
 
-////SHUTTER COMMANDS
-//IN
-#define SHUT_I_INIT 'i'
-#define SHUT_I_EMERGENCY_CLOSE 'e' //used for fast closing like rain or etc.
-#define SHUT_I_EMERGENCY_STOP  'y'
-#define SHUT_I_RESET 'r'  //reboot system
-#define SHUT_I_QRY_ENDSTOP 'q' //used for querying endstop
+// SHUTTER COMMANDS
+// IN
+const char SHUT_I_INIT = 'i';
+const char SHUT_I_EMERGENCY_CLOSE = 'e';
+const char SHUT_I_EMERGENCY_STOP = 'y';
+const char SHUT_I_RESET = 'r';
+const char SHUT_I_QRY_ENDSTOP = 'q';
 
-//N/OUT
-#define SHUT_IO_CLOSE 'c' //OUT command value closing start 1, 0 closed, -1 endstop not engage
-#define SHUT_IO_OPEN 'o'  // OUT command value opening start 1, 0 opened, -1 endstop not engage
-#define SHUT_IO_QRY_STEPPER_POS 'p' //query stepper position to determine max open position
-//const char SHUT_IO_VOLTAGE = 'w'; //not developed yet
+// N/OUT
+const char SHUT_IO_CLOSE = 'c';
+const char SHUT_IO_OPEN = 'o';
+const char SHUT_IO_QRY_STEPPER_POS = 'p';
+// const char SHUT_IO_VOLTAGE = 'w'; // not developed yet
 
-//OUT
-#define SHUT_O_INFORMATION 'f'
-#define SHUT_O_PING 'g'
+// OUT
+const char SHUT_O_INFORMATION = 'f';
+const char SHUT_O_PING = 'g';
 
-//TESTING
-#define C_TEST 'x'  //for testing
+// TESTING
+const char C_TEST = 'x';
 
-//ROTATOR SIDE COMMAND
-#define SHUT_O_INIT 'i'
-////COMMANDS END
-#define DELIMITER "#"
+// ROTATOR SIDE COMMAND
+const char SHUT_O_INIT = 'i';
+
+// delimiter
+const String DELIMITER = "#";
 
 //global vars
 extern bool shut_es_open;

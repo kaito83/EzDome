@@ -6,8 +6,8 @@ public:
   void init(float speed, float accel);
   long move(long move);
   void disable(bool S);
-  void set_positon(long pos);
-  long position();
+  void set_position(long pos);
+  long get_position();
   bool isrun();
   void stop();
 };

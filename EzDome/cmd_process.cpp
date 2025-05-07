@@ -32,21 +32,21 @@ void cmd_process(String rx) {  //Incoming serial commands from pc
         ctrls.ALT_limit_check(cmd_val);
         break;
       }
-    case ROT_IO_DMPOS:
+    case ROT_IO_DDDPOS:
       {
         if (rot_ignore_AZ == false) {
-          ctrls.DMtoSteps(cmd_val);
+          ctrls.DDD_ddtoSteps(cmd_val.toDouble());
         }
         break;
       }
     case ROT_I_QUERY_POS:
       {
-        ctrls.transmit_DMpos(true);
+        ctrls.transmit_DDD_ddpos(true);
         break;
       }
     case ROT_I_SYNC:
       {
-        ctrls.sync_DM(cmd_val);
+        ctrls.sync_DDD_dd(cmd_val.toDouble());
         break;
       }
     case ROT_IO_HOME:
@@ -103,7 +103,7 @@ void cmd_process(String rx) {  //Incoming serial commands from pc
     // for testing,debuging etc just for development
     case C_TEST:
       {
-        ctrls.es_home(ctrls.es_qry(false));
+        ctrls.get_pos();
         break;
       }
   }

@@ -4,13 +4,13 @@
 class f_controls {
 public:
   bool es_qry(bool condition);
-  
-  void init();  
-  void es_home(bool sw);  
+
+  void init();
+  void es_home(bool sw);
   void reset();
-  void transmit_DMpos(bool qry_pos);
-  void DMtoSteps(String dm);
-  void sync_DM(String dm);
+  void transmit_DDD_ddpos(bool qry_pos);
+  void DDD_ddtoSteps(float ddd_dd);
+  void sync_DDD_dd(float ddd_dd);
   void cmd_tranfser(String rx);
   void init_inputs();
 
@@ -23,8 +23,12 @@ public:
   void rotator_stop();
   void rotator_find_home();
   void rotator_estop();
+  
+  //for testing sitations
+  void get_pos();
 private:
-  void stepToDM(long pos);
+  String getValue(String data, char separator, int index);
+  void stepTo_DDD_dd(long pos);
   void ALT_flip();
 };
 

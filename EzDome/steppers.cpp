@@ -11,7 +11,6 @@ FastAccelStepper *rotator = NULL;
 
 //initing motor
 void stepper::init(float speed, float accel) {
-
   engine.init();
 
   rotator = engine.stepperConnectToPin(rotator_stp);
@@ -20,8 +19,6 @@ void stepper::init(float speed, float accel) {
   rotator->setAutoEnable(true);
   rotator->setAcceleration(accel);
   rotator->setSpeedInHz(speed);
-
-
 }
 
 // rotor movement always find shortest route
@@ -51,12 +48,12 @@ void stepper::disable(bool S) {
 }
 
 //updating motor position
-void stepper::set_positon(long pos) {
+void stepper::set_position(long pos) {
   rotator->setCurrentPosition(pos);
 }
 
 //query motor position
-long stepper::position() {
+long stepper::get_position() {
   long pos;
   pos = rotator->getCurrentPosition();
   if (pos >= rot_full_rotation)

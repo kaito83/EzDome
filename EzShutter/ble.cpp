@@ -8,7 +8,6 @@
 
 BlockNot bn_BLEScan(15000);
 
-
 BLEDevice shutter_peripheral;
 BLECharacteristic RXCharacteristic(BLE_RXUID, BLEWrite | BLERead | BLENotify, 20);
 BLECharacteristic TXCharacteristic(BLE_TXUID, BLEWriteWithoutResponse, 20);

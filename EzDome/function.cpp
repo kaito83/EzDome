@@ -20,7 +20,7 @@ BlockNot frot_bn_BLE(5000);
 //DHT reading 1min you can change this
 BlockNot frot_bn_dht(long(rotator_dht_read));
 //sending the stepper position frequency is calculated, to reduce load
-BlockNot fshut_bn_trans_pos(round(rot_full_rotation / rot_goto_spd) - (round(rot_full_rotation / rot_goto_spd) / 10));
+BlockNot fshut_bn_trans_pos(round(rot_full_rotation / rot_goto_spd) );//- (round(rot_full_rotation / rot_goto_spd) / 10));
 
 //endstop check with bounce
 Bounce2::Button shut_bes_home = Bounce2::Button();
@@ -29,8 +29,8 @@ Bounce2::Button shut_bes_home = Bounce2::Button();
 DHT dht(rotator_dht_pin, rotator_dht_type);
 
 
-String DMSEP = ":";
-char DMSEP_C = ':';
+String SEPR = ":";
+char SEPR_C = ':';
 
 //Soft reseting the board
 void (*resetFunc)(void) = 0;
@@ -42,16 +42,30 @@ void f_controls::reset() {
 
 void f_controls::dht_read() {
   if (frot_bn_dht.TRIGGERED) {
-    srl.out(ROT_DHT, String(dht.readTemperature()) + DMSEP + String(dht.readHumidity()));
+    srl.out(ROT_DHT, String(dht.readTemperature()) + SEPR + String(dht.readHumidity()));
   }
 }
 
+//conversation for DDD.dd
+String f_controls::getValue(String data, char separator, int index) {
+  int found = 0;
+  int strIndex[] = { 0, -1 };
+  int maxIndex = data.length() - 1;
+  for (int i = 0; i <= maxIndex && found <= index; i++) {
+    if (data.charAt(i) == separator || i == maxIndex) {
+      found++;
+      strIndex[0] = strIndex[1] + 1;
+      strIndex[1] = (i == maxIndex) ? i + 1 : i;
+    }
+  }
+  return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
+}
+
+
 // fan section
-
-
 void f_controls::run_fan(String speed) {
-  // int fanid = getValue(c, DMSEP_C, 0).toInt();
-  // int speed = getValue(c, DMSEP_C, 1).toInt();
+  // int fanid = getValue(c, SEPR_C, 0).toInt();
+  // int speed = getValue(c, SEPR_C, 1).toInt();
   // switch (fanid) {
   //   case 0:
   //     {
@@ -146,59 +160,49 @@ void f_controls::es_home(bool es_qry) {
   }
   if (es_qry == true && rot_zerosearch == true) {
     rot_zerosearch = false;
-    stp.set_positon(0);
-    srl.out(ROT_IO_DMPOS, String(0));
+    stp.set_position(0);
+    srl.out(ROT_IO_DDDPOS, String(0));
     srl.out(ROT_O_INFORMATION, "4");
   }
 }
 
-//converting steps to DM
-void f_controls::stepToDM(long pos) {
-  String s_pos;
-  double mm = 0.000;
-  double fr;
-  pos = stp.position();
-  mm = pos / (rot_step_DM);
-  if (mm < 0.000)
-    mm += 21600.000;
-  if (mm >= 21600.000)
-    mm -= 21600.000;
-  s_pos = String(int(trunc(mm / 60))) + DMSEP + String(int(trunc(modf(mm / 60, &fr) * 60)));
- // srl.out(C_TEST, String(pos));
-  srl.out(ROT_IO_DMPOS, s_pos);
+//converting steps to DDD.dd
+void f_controls::stepTo_DDD_dd(long pos) {
+  double azimuth_dd = (pos * ((360.0 * resolution_factor) / rot_full_rotation)) / resolution_factor;
+  //
+  // Serial.println(String(pos));
+  // Serial.println(String(resolution_factor));
+  // Serial.println(String(rot_full_rotation)); 
+  srl.out(ROT_IO_DDDPOS, String(azimuth_dd,4));
 }
 
 //transmitting rotator position
-void f_controls::transmit_DMpos(bool qry_pos) {
+void f_controls::transmit_DDD_ddpos(bool qry_pos) {
   //transmit if runing with triggered calc
   if (stp.isrun() == true && fshut_bn_trans_pos.TRIGGERED) {
-    stepToDM(stp.position());
+    stepTo_DDD_dd(stp.get_position());
   }
   //used for quering the position
   if (qry_pos == true) {
-    stepToDM(stp.position());
+    stepTo_DDD_dd(stp.get_position());
   }
 }
 
 //syncing rotator to mount
-void f_controls::sync_DM(String dm) {
-  int ddd;
-  int mm;
+void f_controls::sync_DDD_dd(float ddd_dd) {
   if (stp.isrun() == false) {
-    ddd = getValue(dm, DMSEP_C, 0).toInt();
-    mm = getValue(dm, DMSEP_C, 1).toInt();
-    stp.set_positon((60 * ddd * rot_step_DM) + (mm * rot_step_DM));
-    ctrls.transmit_DMpos(true);
+    stp.set_position(round(ddd_dd * rot_step_DD * resolution_factor));
+    ctrls.transmit_DDD_ddpos(true);
   }
 }
 
 // rotator 180° flipping function
 void f_controls::ALT_flip() {
   if (rot_ignore_AZ == false) {
-    if (rot_full_rotation / 2 > stp.position()) {
-      stp.move(stp.position() + (rot_full_rotation / 2));
+    if (rot_full_rotation / 2 > stp.get_position()) {
+      stp.move(stp.get_position() + (rot_full_rotation / 2));
     } else {
-      stp.move(stp.position() - (rot_full_rotation / 2));
+      stp.move(stp.get_position() - (rot_full_rotation / 2));
     }
     srl.out(ROT_O_INFORMATION, "5");
   }
@@ -207,7 +211,6 @@ void f_controls::ALT_flip() {
 //disable AZ coordinates until the ALT lower than rot_max_ALT, called from cmd_proccess
 void f_controls::ALT_limit_check(String ALT) {
   if (ALT.toInt() >= rot_max_ALT) {
-
     //flip called once, and set rot_ignore_AZ to true
     ALT_flip();
     rot_ignore_AZ = true;
@@ -218,13 +221,9 @@ void f_controls::ALT_limit_check(String ALT) {
   }
 }
 
-//converting DM to steps
-void f_controls::DMtoSteps(String dm) {
-  int ddd;
-  int mm;
-  ddd = getValue(dm, DMSEP_C, 0).toInt();
-  mm = getValue(dm, DMSEP_C, 1).toInt();
-  stp.move((60 * ddd * rot_step_DM) + (mm * rot_step_DM));
+//converting DDD.dd to steps
+void f_controls::DDD_ddtoSteps(float ddd_dd) {
+  stp.move(round(ddd_dd * rot_step_DD * resolution_factor));
 }
 
 //emergency stop function instantly stop everything
@@ -254,17 +253,22 @@ void f_controls::rotator_find_home() {
 
 //rotator initing send info about params resolution, position, and status
 void f_controls::init() {
-  srl.out(ROT_O_PARAMS, "0" + DMSEP + version);
-  srl.out(ROT_O_PARAMS, "1" + DMSEP + String(rot_step_rev));
-  srl.out(ROT_O_PARAMS, "2" + DMSEP + String(rot_full_rotation));
-  srl.out(ROT_O_PARAMS, "3" + DMSEP + String(rot_step_DM));
-  srl.out(ROT_O_PARAMS, "4" + DMSEP + String(stp.position()));
+  srl.out(ROT_O_PARAMS, "0" + SEPR + version);
+  srl.out(ROT_O_PARAMS, "1" + SEPR + String(rot_step_rev));
+  srl.out(ROT_O_PARAMS, "2" + SEPR + String(rot_full_rotation));
+  srl.out(ROT_O_PARAMS, "3" + SEPR + String(rot_step_DD, 4));
+  srl.out(ROT_O_PARAMS, "4" + SEPR + String(stp.get_position()));
+  srl.out(ROT_O_PARAMS, "5" + SEPR + String(resolution_factor));
   //check home status
   es_home(es_qry(false));
   //check position
-  transmit_DMpos(true);
+  transmit_DDD_ddpos(true);
   //query shutter's es status
   ble_tx(SHUT_I_QRY_ENDSTOP, "0");
+}
+
+void f_controls::get_pos() {
+  Serial.println(String(stp.get_position()));
 }
 
 //transmitting commands from shutter hardware to rotator serial
