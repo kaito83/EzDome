@@ -17,7 +17,7 @@ Sorry but I won't and don't intend to help with hardware installation or where t
 Features:
 
 EzDome(rotator): 
-  -   Resolution DD:MM (360*60=21600)
+  -   Resolution DD:DDD (360*100=36000 or up to 1000)
   -   Home find, shortest route on GOTO
   -   PWM controll for fan or etc.
   -   Etc, what a simple Dome needs to know
