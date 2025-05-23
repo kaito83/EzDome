@@ -57,19 +57,21 @@ const long rot_full_rotation = G1 * G2 * rot_step_rev;
 const double rot_step_DD = double(rot_full_rotation) / (360.0 * resolution_factor);  // for azimuthDDD.dd stepping
 
 ////ROTATOR COMMANDS
+// protocol example: Command separator parameter/value
+//                   D#200.0 this means goto AZ 200 
 //IN
-const char ROT_I_REQUEST_INIT = 'I';
-const char ROT_I_STOP = 'P';            //Stop rotator
-const char ROT_I_EMERGENCY_STOP = 'Y';  //Emergency stop rotator
-const char ROT_I_SYNC = 'S';            //Sync to mount
-const char ROT_I_RESET = 'R';           //reset, reboot
-const char ROT_I_QUERY_POS = 'Q';       //query position
-const char ROT_I_FAN = 'A';             //fan controll
-const char ROT_I_ALT = 'L';             //Altitude data
+const char ROT_I_REQUEST_INIT = 'I'; //I#0
+const char ROT_I_STOP = 'P';            //Stop rotator, P#0
+const char ROT_I_EMERGENCY_STOP = 'Y';  //Emergency stop rotator, Y#0
+const char ROT_I_SYNC = 'S';            //Sync to mount, S#100.1 <- AZ position in float
+const char ROT_I_RESET = 'R';           //reset, reboot S#0
+const char ROT_I_QUERY_POS = 'Q';       //query position Q#0
+const char ROT_I_FAN = 'A';             //fan controll A#0 -> A#255
+const char ROT_I_ALT = 'L';             //Altitude data L#90
 
 //IN/OUT
-const char ROT_IO_DDDPOS = 'D';  //GOTO DDD.d*factor position
-const char ROT_IO_HOME = 'H';    //Rotator find home
+const char ROT_IO_DDDPOS = 'D';  //GOTO DDD.d*factor position in D#10.2 out the same
+const char ROT_IO_HOME = 'H';    //Rotator find home H#0
 
 //OUT
 const char ROT_O_PARAMS = 'P';
@@ -81,7 +83,7 @@ const char ROT_O_PARAMS = 'P';
 //  4 pos_rotator
 
 const char ROT_O_INFORMATION = 'F';
-////ROT_O_INFORMATION
+////ROT_O_INFORMATION, example F#2 finding home
 // 0 Rotator emergency STOP!
 // 1 Rotator STOP!
 // 2 Rotator finding home
@@ -90,19 +92,21 @@ const char ROT_O_INFORMATION = 'F';
 // 5 Rotator fliped AZ ignored until ALT limit below
 // 6 Rotator return to normal AZ movement
 // 7 Rotator not at home
-const char ROT_O_PING = 'G';
+const char ROT_O_PING = 'G'; //this is just a ping nothgin more G#0
 //DHT sensor char
-const char ROT_DHT = 'T';
+const char ROT_DHT = 'T'; //T#this returns strings
 
-////SHUTTER COMMANDS
+////SHUTTER COMMANDS, same as a rotator commands, there is no special input values everything with command#0
 //IN
-const char SHUT_I_INIT = 'i';
-const char SHUT_I_EMERGENCY_CLOSE = 'e';  //used for fast closing like rain or etc.
+const char SHUT_I_INIT = 'i'; 
+const char SHUT_I_EMERGENCY_CLOSE = 'e';  //used for fast closing like rain or etc, not devoloped yet well :P
 const char SHUT_I_EMERGENCY_STOP = 'y';
 const char SHUT_I_RESET = 'r';  //reboot system
 const char SHUT_I_QRY_ENDSTOP = 'q';
 
-//N/OUT
+//IN/OUT,
+//IN example c#0 close shutter OUT shutter is closed
+//OUT c#1 closing, c#-1 error 
 const char SHUT_IO_CLOSE = 'c';
 const char SHUT_IO_OPEN = 'o';
 //const char  SHUT_IO_VOLTAGE 'w' //not developed yet
