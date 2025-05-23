@@ -48,6 +48,14 @@ Stand alone UI (EzDome.exe):
 ASCOM driver(EzDome Setup.exe):
 - I hate VC components (to ugly for me) it's not stande alone anymore, external exe need to controll the dome, communication via UDP, default is port 9999 it can be any, look above
 
+My HW setup:
+- two esp32 for rotator and sutter
+- two MKS TMC2160OC
+- two NEMA23 1.8°
+- TWO 10:1 gearbox
+- OPO sensor for rotator home
+- two endswitch for shutter
+
 More functions and redesigns may comming!
 
 ![Untitled](https://github.com/user-attachments/assets/19ba08c0-2fa1-436f-8312-f864018e1b65)
