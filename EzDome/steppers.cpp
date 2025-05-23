@@ -24,15 +24,19 @@ void stepper::init(float speed, float accel) {
 // rotor movement always find shortest route
 long stepper::move(long move) {
   long current = rotator->getCurrentPosition();
-  long delta = move - current;
+  long delta = (move - current) % rot_full_rotation;
 
   if (delta > rot_full_rotation / 2) {
     delta -= rot_full_rotation;
   } else if (delta < -rot_full_rotation / 2) {
     delta += rot_full_rotation;
   }
+
   long target = current + delta;
-  rotator->moveTo(target);
+  if (rot_zerosearch == true)
+    rotator->moveTo(move);
+  else
+    rotator->moveTo(target);
   return delta;
 }
 
@@ -40,6 +44,10 @@ long stepper::move(long move) {
 //stoping the motor
 void stepper::stop() {
   rotator->stopMove();
+}
+
+void stepper::forceStop() {
+  rotator->forceStop();
 }
 
 //disable motors enable pin

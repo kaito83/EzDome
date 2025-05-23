@@ -20,7 +20,7 @@ BlockNot frot_bn_BLE(5000);
 //DHT reading 1min you can change this
 BlockNot frot_bn_dht(long(rotator_dht_read));
 //sending the stepper position frequency is calculated, to reduce load
-BlockNot fshut_bn_trans_pos(round(rot_full_rotation / rot_goto_spd) );//- (round(rot_full_rotation / rot_goto_spd) / 10));
+BlockNot fshut_bn_trans_pos(round(rot_full_rotation / rot_goto_spd));  //- (round(rot_full_rotation / rot_goto_spd) / 10));
 
 //endstop check with bounce
 Bounce2::Button shut_bes_home = Bounce2::Button();
@@ -155,25 +155,26 @@ void f_controls::rotator_init() {
 
 //always called to check home position
 void f_controls::es_home(bool es_qry) {
-  if (es_qry == true) {
-    srl.out(ROT_O_INFORMATION, "3");
-  }
+
   if (es_qry == true && rot_zerosearch == true) {
     rot_zerosearch = false;
-    stp.set_position(0);
-    srl.out(ROT_IO_DDDPOS, String(0));
+    stp.forceStop();
+    int corrected_offset = ((rot_home_offset % rot_full_rotation) + rot_full_rotation) % rot_full_rotation;
+    stp.set_position(corrected_offset);
     srl.out(ROT_O_INFORMATION, "4");
+    stepTo_DDD_dd(corrected_offset);
+  }
+  if (es_qry == true && rot_zerosearch == false) {
+    srl.out(ROT_O_INFORMATION, "3"); //rotator at home
+  if (es_qry == false && rot_zerosearch == false) 
+    srl.out(ROT_O_INFORMATION, "7"); //rotator at not home
   }
 }
 
 //converting steps to DDD.dd
 void f_controls::stepTo_DDD_dd(long pos) {
   double azimuth_dd = (pos * ((360.0 * resolution_factor) / rot_full_rotation)) / resolution_factor;
-  //
-  // Serial.println(String(pos));
-  // Serial.println(String(resolution_factor));
-  // Serial.println(String(rot_full_rotation)); 
-  srl.out(ROT_IO_DDDPOS, String(azimuth_dd,4));
+  srl.out(ROT_IO_DDDPOS, String(azimuth_dd, 4));
 }
 
 //transmitting rotator position
@@ -229,7 +230,7 @@ void f_controls::DDD_ddtoSteps(float ddd_dd) {
 //emergency stop function instantly stop everything
 void f_controls::rotator_estop() {
   emergency_stop = true;
-  stp.stop();
+  stp.forceStop();
   stp.disable(true);
   srl.out(ROT_O_INFORMATION, "0");
 }
@@ -246,7 +247,8 @@ void f_controls::rotator_find_home() {
   if (rot_swathome == false) {
     rot_zerosearch = true;
     stp.init(rot_goto_spd, rot_acc);
-    stp.move(rot_full_rotation * find_home_overlap_percent);
+    stp.set_position(0);
+    stp.move(round(rot_full_rotation * find_home_overlap_percent));
     srl.out(ROT_O_INFORMATION, "2");
   }
 }
@@ -262,7 +264,7 @@ void f_controls::init() {
   //check home status
   es_home(es_qry(false));
   //check position
-  transmit_DDD_ddpos(true);
+  ctrls.transmit_DDD_ddpos(true);
   //query shutter's es status
   ble_tx(SHUT_I_QRY_ENDSTOP, "0");
 }

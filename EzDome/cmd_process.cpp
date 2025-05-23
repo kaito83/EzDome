@@ -103,6 +103,7 @@ void cmd_process(String rx) {  //Incoming serial commands from pc
     // for testing,debuging etc just for development
     case C_TEST:
       {
+        //quering actual poistion in steps
         ctrls.get_pos();
         break;
       }

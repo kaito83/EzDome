@@ -43,6 +43,8 @@ void loop() {
   if (emergency_stop == false) {
     ctrls.transmit_DDD_ddpos(false);
   }
-  ctrls.es_home(ctrls.es_qry(true));
+  if (rot_zerosearch == true) {
+    ctrls.es_home(ctrls.es_qry(true));
+  }
   srl.popbuf();
 }

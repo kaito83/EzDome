@@ -2,33 +2,35 @@
 #define EzDome_h
 #include <Arduino.h>;
 
-#define version "2.90b"
+#define version "3.10b"
 
 ////CONFIG SECTION, modify only #defines////
 //rotator const  params
 #define rot_microstp 8                   //NO Software microstepping, set on the hardware
 #define rot_step_rev 200 * rot_microstp  //motor steps * microsteps
-#define rot_goto_spd 35                  //speed
-#define rot_acc 70                       //acceleration
-#define find_home_overlap_percent 1.02   //overlap during the home search
+#define rot_goto_spd 3500                  //speed
+#define rot_acc 700                       //acceleration
+#define find_home_overlap_percent 1.1   //overlap during the home search
+#define rot_home_offset 0//4800 // Applies a step offset if home sensor is not at 0° (true north), (-West,+EAST) 
+                              //Math to AZ: rot_home_offset / rot_step_DD(Init param #3 or rot_step_DD in under dont touch section) / resolution_factor
 #define rot_max_ALT 87                   //maximum ALT due to roof visibilty, if this value reached the rotator flips 180° and ignoring the azimuth until data lower than rot_max_ALT
-#define resolution_factor 100            //min 10,100,1000,10000 max
+#define resolution_factor 100            //min 10,100,1000 max
 
-//rotator gear ratios, example big gear 1000 little 10, ratio is 1000:10 / 100:1, G1 = 100
-#define G1 1  //36
-#define G2 1  //10
+//rotator gear ratios, example big gear 1000 little 10, ratio is 1000:10 -> 100:1, G1 = 100
+#define G1 36  //36
+#define G2 10  //10
 
 //Sensors, endstop settings
-#define rotator_es_home 34
+#define rotator_es_home 13
 #define rotator_dht_pin 5
 #define rotator_dht_read 30000  //dht update, example: ms 5000 = 5 sec,
 #define rotator_dht_type DHT22
 
 ////rotator pin mappings, set the right pins
 //rotator stepper
-#define rotator_en 12   //18 //12 testbaord
-#define rotator_stp 25  //21 //25 testboard
-#define rotator_dir 27  //19 //27 testbpard
+#define rotator_en 18 //12 testbaord
+#define rotator_stp 21 //25 testboard
+#define rotator_dir 19 //27 testbpard
 #define rotator_en_invert true
 #define rotator_stp_invert false
 #define rotator_dir_invert false
@@ -84,9 +86,10 @@ const char ROT_O_INFORMATION = 'F';
 // 1 Rotator STOP!
 // 2 Rotator finding home
 // 3 Rotator reached home nothing to do
-// 4 Rotator at home, zerosearch finished, reset Rotator pos to 0
+// 4 Rotator at home, zerosearch finished, reset Rotator pos to rot_home_offset
 // 5 Rotator fliped AZ ignored until ALT limit below
 // 6 Rotator return to normal AZ movement
+// 7 Rotator not at home
 const char ROT_O_PING = 'G';
 //DHT sensor char
 const char ROT_DHT = 'T';

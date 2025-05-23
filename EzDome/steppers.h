@@ -10,5 +10,6 @@ public:
   long get_position();
   bool isrun();
   void stop();
+  void forceStop();
 };
 #endif

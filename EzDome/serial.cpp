@@ -6,8 +6,8 @@
 serial_c srl;
 //limiting buffer send rate to 50ms
 BlockNot serial_trig(50);
-//FIFO to store commands
-FIFObuf<String> ser_fifo(30);
+//FIFO to store outgoing commands
+FIFObuf<String> ser_fifo(100);
 
 //starting serial communication
 void serial_c::init() {
