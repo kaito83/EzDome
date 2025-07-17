@@ -21,6 +21,11 @@ void stepper::move(long move) {
   shutter->moveTo(move);
 }
 
+void stepper::enable(bool en)
+{
+  shutter->setAutoEnable(en);
+}
+
 long stepper::position() {
   return shutter->getCurrentPosition();
 }
@@ -30,10 +35,12 @@ void stepper::forcestop() {
 }
 
 void stepper::softstop() {
+  enable(false);
   shutter->stopMove();
 }
 
 void stepper::set_positon(long pos) {
+
   shutter->setPositionAfterCommandsCompleted(pos);
 }
 

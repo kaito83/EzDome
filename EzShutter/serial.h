@@ -1,7 +1,6 @@
 #ifndef serial_h
 #define serial_h
-#include <FIFObuf.h>;
-#include <BlockNot.h>;
+#include <Arduino.h>;
 
 class serial_c {
 public:

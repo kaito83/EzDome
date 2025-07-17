@@ -14,5 +14,6 @@ public:
   bool isrun();
   void forcestop();
   void softstop();
+  void enable(bool en);
 };
 #endif

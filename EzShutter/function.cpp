@@ -86,15 +86,20 @@ bool f_controls::query_es(int es, bool condition) {
       }
   }
 }
-
 //function to move shutter
 void f_controls::move(long pos) {
   //prevent to over moves
-  if (((pos >= (0 - shut_overlap_move)) && !shut_es_close) || ((pos <= (shut_max_move + shut_overlap_move)) && !shut_es_open)) {
+  /* if (((pos >= (0 - shut_overlap_move)) && !shut_es_close) || ((pos <= (shut_max_move + shut_overlap_move)) && !shut_es_open)) {
     //if (((pos >= (0)) && !shut_es_close) || ((pos <= (shut_max_move)) && !shut_es_open)) {
     rly_ctrl(1);
     stp.move(pos);
-  }
+  }*/
+
+  if (pos > (0 - shut_overlap_move) && shut_es_open) return;   // már nyitva van
+  if (pos < (shut_max_move + shut_overlap_move) && shut_es_close) return;  // már zárva van
+
+  rly_ctrl(1);
+  stp.move(pos);
 }
 
 //manual buttons for open/close
@@ -189,6 +194,7 @@ void f_controls::estop() {
   stp.forcestop();
   srl.out(SHUT_O_INFORMATION, "Emergency stop!", false);
   srl.out(SHUT_I_EMERGENCY_STOP, "0", true);
+  stp.enable(0);
   rly_ctrl(0);
 }
 
