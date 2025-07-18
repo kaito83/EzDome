@@ -37,6 +37,7 @@ Set your pinouts in EzDome.h, EzShutter.h and other settings (only end of Config
 Flashing with Arduino IDE, choose ESP32 Dev module, 240Mhz Wifi/BT, flash mode DIO.
 
 Serial communication bitrate: 9600
+
 ------------
 
 Stand alone UI (EzDome.exe):
@@ -67,4 +68,4 @@ Some tips:
 
 More functions and redesigns may comming!
 
-![Untitled](https://github.com/user-attachments/assets/19ba08c0-2fa1-436f-8312-f864018e1b65)
+<img width="571" height="440" alt="UI" src="https://github.com/user-attachments/assets/a5224511-bfda-4850-a729-d67489f9f9c4" />
