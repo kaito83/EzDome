@@ -56,6 +56,15 @@ My HW setup:
 - OPO sensor for rotator home
 - two endswitch for shutter
 
+Some tips:
+- In native UI if you change the port you should restart it.
+- The native UI cannot be closed when dome is connected.
+- Roof can be controlled via serial (stand alone mode for roof controll), the roof calibration must be should this way, dont turn on rotator ESP during this procedure!!!
+- During the roof calibration to determine the **shut_max_move** value there is a prodecure in function.cpp which instantly stop the moving when endstops hited. 
+  This is the **void f_controls::monitor_es()**, this can be used for to measure the shut_max_move, just comment out the **stp.set_positon(shut_max_move);** -> **//stp.set_positon(shut_max_move);**
+  Shutter must be closed and all endstop must be seted well btw this is the most important thing in roof!
+  Type in Arduino IDE into the Serial monitor command **o#0** this will open the roof wait for the shutter to open fully and stop by itself type **p#0** and you will get the value for shut_max_move.
+
 More functions and redesigns may comming!
 
 ![Untitled](https://github.com/user-attachments/assets/19ba08c0-2fa1-436f-8312-f864018e1b65)
