@@ -18,6 +18,7 @@ void stepper::init(int speed, int accel) {
 }
 
 void stepper::move(long move) {
+  enable(true);
   shutter->moveTo(move);
 }
 
