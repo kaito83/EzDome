@@ -49,7 +49,7 @@ void f_controls::rly_ctrl(bool on_off) {
 
 //alarm if not closed/opened successful or something hitted the endstops
 void f_controls::alarm() {
-  if (bn_alarm.TRIGGERED && stp.isrun() == false) {    
+  if (bn_alarm.TRIGGERED && stp.isrun() == false) {
     if (shut_opening == true && shut_es_open == false) {
       srl.out(SHUT_IO_OPEN, "-1", true);
     }
@@ -85,19 +85,18 @@ bool f_controls::query_es(int es, bool condition) {
       }
   }
 }
+
+String f_controls::pos_in_perc(long pos) {
+  return String((double)abs(pos) / (shut_max_move + shut_overlap_move) * 100);
+}
+
 //function to move shutter
 void f_controls::move(long pos) {
   //prevent to over moves
-  /* if (((pos >= (0 - shut_overlap_move)) && !shut_es_close) || ((pos <= (shut_max_move + shut_overlap_move)) && !shut_es_open)) {
-    //if (((pos >= (0)) && !shut_es_close) || ((pos <= (shut_max_move)) && !shut_es_open)) {
-    rly_ctrl(1);
-    stp.move(pos);
-  }*/
   if (!stp.isrun()) {
-    if (pos > (0 - shut_overlap_move) && shut_es_open) return;               // már nyitva van
-    if (pos < (shut_max_move + shut_overlap_move) && shut_es_close) return;  // már zárva van
+    if (pos > (0 - shut_overlap_move) && shut_es_open) return;               
+    if (pos < (shut_max_move + shut_overlap_move) && shut_es_close) return;
   }
-
   rly_ctrl(1);
   stp.move(pos);
 }
@@ -108,12 +107,10 @@ void f_controls::button_monitoring() {
   btn_open.update();
   if (btn_close.pressed()) {
     shut_opening = false;
-
     move(0 - shut_overlap_move);
   }
   if (btn_open.pressed()) {
     shut_opening = true;
-
     move(shut_max_move + shut_overlap_move);
   }
   if (btn_open.isPressed() && btn_close.isPressed()) {
@@ -127,7 +124,6 @@ void f_controls::actual_es() {
     srl.out(SHUT_IO_CLOSE, "0", true);
     shut_es_open = false;
     shut_es_close = true;
-
   } else {
     shut_es_close = false;
     shut_es_open = true;
@@ -144,26 +140,28 @@ void f_controls::actual_es() {
 
 //control function for endstops its runing in main loop, querying endstop status via query_es
 //stoping function, instantly stops the motor when endstop reached, and set default position 0 for closed, shut_max_move for open
-//recommend calibration process close the shutter this will be 0
-//and try out the max movement becarefull the forcestop and/or the relay control cut off the power from the driver be ready to catch the shutter
+//recommend calibration process, close the shutter this will be 0
+//and try out the max movement becarefull under the process if something goes wrong ready to catch/stop the shutter
 //before shut_max_move calibration disable stp.set_positon-s tip add high value for shut_max_move and check where is the position with p#0 command
 void f_controls::monitor_es() {
-  if (query_es(0, true) == true) {
-    srl.out(SHUT_IO_CLOSE, "0", true);
+  if (query_es(0, true) == true) {    
     stp.forcestop();
     shut_es_open = false;
     shut_es_close = true;
     rly_ctrl(0);
     stp.set_positon(0);
+    srl.out(SHUT_IO_CLOSE, "1:" + "0", true);
+    srl.out(SHUT_IO_CLOSE, "0", true);
   }
-  if (query_es(1, true) == true) {
-    srl.out(SHUT_IO_OPEN, "0", true);
+  if (query_es(1, true) == true) {    
     stp.forcestop();
     shut_es_close = false;
     shut_es_open = true;
     rly_ctrl(0);
     //disable stp.set_positon during calibration
     stp.set_positon(shut_max_move);
+    srl.out(SHUT_IO_OPEN, "1:" + "100", true);
+    srl.out(SHUT_IO_OPEN, "0", true);
   }
 }
 
@@ -177,12 +175,11 @@ void f_controls::ping() {
 //moving notification
 void f_controls::position() {
   if (stp.isrun() == true && bn_stepper.TRIGGERED) {
-    //curr_pos();
-    //send val with 1 opening/closeing to report moving is on
+    //send val with 1 opening/closeing to report moving with percentage, 0% is closed
     if (shut_opening == false) {
-      srl.out(SHUT_IO_CLOSE, "1", true);
+      srl.out(SHUT_IO_CLOSE, "1:" + pos_in_perc(stp.position()), true);
     } else {
-      srl.out(SHUT_IO_OPEN, "1", true);
+      srl.out(SHUT_IO_OPEN, "1:" + pos_in_perc(stp.position()), true);
     }
   }
 }
@@ -190,7 +187,7 @@ void f_controls::position() {
 //query the position
 void f_controls::curr_pos() {
   srl.out(SHUT_IO_QRY_STEPPER_POS, String(stp.position()), true);
-  srl.out(SHUT_IO_QRY_STEPPER_POS, String(stp.position()), false);
+  srl.out(SHUT_IO_QRY_STEPPER_POS, String(stp.position()), false); 
 }
 
 //shutter emergency stop

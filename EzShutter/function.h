@@ -25,6 +25,7 @@ public:
   void alarm();  
   void ping();
 private:
+  String pos_in_perc(long pos);
   bool query_es(int es, bool condition);
   void rly_ctrl(bool on_off);
 };
