@@ -150,7 +150,7 @@ void f_controls::monitor_es() {
     shut_es_close = true;
     rly_ctrl(0);
     stp.set_positon(0);
-    srl.out(SHUT_IO_CLOSE, "1:" + "0", true);
+    srl.out(SHUT_IO_CLOSE, String("1:") + "0", true);
     srl.out(SHUT_IO_CLOSE, "0", true);
   }
   if (query_es(1, true) == true) {    
@@ -160,7 +160,7 @@ void f_controls::monitor_es() {
     rly_ctrl(0);
     //disable stp.set_positon during calibration
     stp.set_positon(shut_max_move);
-    srl.out(SHUT_IO_OPEN, "1:" + "100", true);
+    srl.out(SHUT_IO_OPEN, String("1:") + "100", true);
     srl.out(SHUT_IO_OPEN, "0", true);
   }
 }
@@ -177,9 +177,9 @@ void f_controls::position() {
   if (stp.isrun() == true && bn_stepper.TRIGGERED) {
     //send val with 1 opening/closeing to report moving with percentage, 0% is closed
     if (shut_opening == false) {
-      srl.out(SHUT_IO_CLOSE, "1:" + pos_in_perc(stp.position()), true);
+      srl.out(SHUT_IO_CLOSE, String("1:") + pos_in_perc(stp.position()), true);
     } else {
-      srl.out(SHUT_IO_OPEN, "1:" + pos_in_perc(stp.position()), true);
+      srl.out(SHUT_IO_OPEN, String("1:") + pos_in_perc(stp.position()), true);
     }
   }
 }
