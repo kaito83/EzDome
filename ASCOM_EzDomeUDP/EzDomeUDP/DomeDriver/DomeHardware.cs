@@ -1,4 +1,4 @@
-﻿// TODO fill in this information for your driver, then remove this line!
+// TODO fill in this information for your driver, then remove this line!
 //
 // ASCOM Dome hardware class for EzDome
 //
@@ -564,7 +564,7 @@ namespace ASCOM.EzDome.Dome
                 {
                     // TODO insert disconnect from the device code here
                     _isRunning = false;
-                    _udpClient?.Close();
+                    _udpClient.Close();
                     //    _udpThread?.Join();
                     //  LogMessage("Connected Set", $"Disconnecting from port {comPort}");
                     connectedState = false;
@@ -578,6 +578,7 @@ namespace ASCOM.EzDome.Dome
         /// <value>The description.</value>
         public static string Description
         {
+            // TODO customise this device description if required
             // TODO customise this device description if required
             get
             {
@@ -703,7 +704,7 @@ namespace ASCOM.EzDome.Dome
         {
             get
             {   //commented out
-                //  LogMessage("AtPark Get", "Not implemented");
+                // LogMessage("AtPark Get", "Not implemented");
                 throw new PropertyNotImplementedException("AtPark", false);
             }
         }
@@ -737,7 +738,7 @@ namespace ASCOM.EzDome.Dome
         /// </summary>
         internal static void FindHome()
         {
-
+            rot_Slewing = true;
             SendUDPData(ROT_IO_HOME, "0");
             // LogMessage("FindHome", "Not implemented");
             // throw new MethodNotImplementedException("FindHome");
@@ -901,7 +902,7 @@ namespace ASCOM.EzDome.Dome
         /// </param>
         internal static void SlewToAzimuth(double Azimuth)
         {
-
+            rot_Slewing = true;
             SendUDPData(ROT_IO_DMPOS, Azimuth.ToString());
 
             // LogMessage("SlewToAzimuth", "Not implemented");
@@ -938,7 +939,7 @@ namespace ASCOM.EzDome.Dome
         internal static void SyncToAzimuth(double Azimuth)
         {
 
-            SendUDPData(ROT_I_SYNC, Azimuth.ToString());
+            SendUDPData(ROT_I_SYNC, Azimuth.ToString(CultureInfo.InvariantCulture));
             //  LogMessage("SyncToAzimuth", "Not implemented");
             //   throw new MethodNotImplementedException("SyncToAzimuth");
         }
@@ -980,7 +981,7 @@ namespace ASCOM.EzDome.Dome
         {
             get
             {
-                LogMessage("CanFindHome Get", false.ToString());
+                LogMessage("CanFindHome Get", true.ToString());
                 return true;
             }
         }
