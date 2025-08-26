@@ -903,7 +903,7 @@ namespace ASCOM.EzDome.Dome
         internal static void SlewToAzimuth(double Azimuth)
         {
             rot_Slewing = true;
-            SendUDPData(ROT_IO_DMPOS, Azimuth.ToString());
+            SendUDPData(ROT_IO_DMPOS, Azimuth.ToString(CultureInfo.InvariantCulture));
 
             // LogMessage("SlewToAzimuth", "Not implemented");
             // throw new MethodNotImplementedException("SlewToAzimuth");
