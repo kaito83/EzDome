@@ -25,6 +25,7 @@ void f_controls::reset() {
 void f_controls::init_inputs() {
   pinMode(shutter_rly_pin, OUTPUT);  // init pin for relay
 
+
   bes_open.attach(shutter_espin_open, INPUT_PULLUP);
   bes_open.interval(10);
   bes_open.setPressedState(LOW);
@@ -41,7 +42,7 @@ void f_controls::init_inputs() {
 }
 
 //relay controll, this called before motor start
-void f_controls::rly_ctrl(bool on_off) {
+void f_controls::rly_ctrl(uint8_t on_off) {
   //turn on relay and wait a little bit
   digitalWrite(shutter_rly_pin, on_off);
   delay(50);
@@ -97,7 +98,7 @@ void f_controls::move(long pos) {
     if (pos > (0 - shut_overlap_move) && shut_es_open) return;               
     if (pos < (shut_max_move + shut_overlap_move) && shut_es_close) return;
   }
-  rly_ctrl(1);
+  rly_ctrl(LOW);
   stp.move(pos);
 }
 
@@ -148,7 +149,7 @@ void f_controls::monitor_es() {
     stp.forcestop();
     shut_es_open = false;
     shut_es_close = true;
-    rly_ctrl(0);
+    rly_ctrl(HIGH);
     stp.set_positon(0);
     srl.out(SHUT_IO_CLOSE, String("1:") + "0", true);
     srl.out(SHUT_IO_CLOSE, "0", true);
@@ -157,7 +158,7 @@ void f_controls::monitor_es() {
     stp.forcestop();
     shut_es_close = false;
     shut_es_open = true;
-    rly_ctrl(0);
+    rly_ctrl(HIGH);
     //disable stp.set_positon during calibration
     stp.set_positon(shut_max_move);
     srl.out(SHUT_IO_OPEN, String("1:") + "100", true);
@@ -196,7 +197,7 @@ void f_controls::estop() {
   srl.out(SHUT_O_INFORMATION, "Emergency stop!", false);
   srl.out(SHUT_I_EMERGENCY_STOP, "0", true);
   stp.enable(0);
-  rly_ctrl(0);
+  rly_ctrl(HIGH);
 }
 
 //shutter initing
@@ -205,7 +206,7 @@ void f_controls::init() {
   stp.init(shut_goto_spd, shut_acc);
   //check the shutter clsoed state, if was a power outage or something and couldnt close, then close it, its not controlled by f_controls::move
   if (query_es(0, false) == false) {
-    rly_ctrl(1);
+    rly_ctrl(LOW);
     stp.move(-1 * (shut_max_move + shut_overlap_move));
     srl.out(SHUT_O_INFORMATION, "Shutter not closed succesfull, closing", false);
   } else {
@@ -213,6 +214,7 @@ void f_controls::init() {
     shut_opening = false;
     shut_es_open = false;
     shut_es_close = true;
+    rly_ctrl(HIGH);
   }
   srl.out(SHUT_O_INFORMATION, version, true);  //sending fw version
 }

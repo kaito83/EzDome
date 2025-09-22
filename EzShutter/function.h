@@ -27,7 +27,7 @@ public:
 private:
   String pos_in_perc(long pos);
   bool query_es(int es, bool condition);
-  void rly_ctrl(bool on_off);
+  void rly_ctrl(uint8_t  on_off);
 };
 
 extern f_controls ctrls;

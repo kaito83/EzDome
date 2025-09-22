@@ -16,7 +16,7 @@ long shut_open_max;
 void setup() {
   shut_open_max = shut_max_move;  // set the maximum opening to the real opening position
   srl.init();                     //init Serial
-  ctrls.init_inputs();            // init endstops
+  ctrls.init_inputs();  
   delay(100);
   ctrls.init();  //init shutter stuff
   ble_init();    // init BLE

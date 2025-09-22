@@ -13,10 +13,10 @@
 
 ////shutter pin mappings, set the right pins
 //enstops
-#define shutter_espin_open 14
-#define shutter_espin_close 27
+#define shutter_espin_open 17
+#define shutter_espin_close 16
 //buttons
-#define shutter_bpin_open 19 
+#define shutter_bpin_open 22 
 #define shutter_bpin_close 21
 
 //shutter stepper settings
